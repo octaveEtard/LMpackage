@@ -101,6 +101,7 @@ trainOpt.method.name = 'ridge-eig-XtX'; % ridge regression
 % normalised regularisation parameter
 trainOpt.method.lambda = 10.^(-6:0.5:6);
 trainOpt.method.removeEig.type = 'tol';
+trainOpt.method.removeEig.tol = 0; % default tolerance
 
 nLambda = numel(trainOpt.method.lambda);
 nPerfSize = numel(tWinPerf);

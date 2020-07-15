@@ -73,6 +73,7 @@ trainOpt.method.name = 'ridge-eig-XtX';
 % regularisation coefficients for which we'll fit the model
 trainOpt.method.lambda = 10.^(-6:0.1:6);
 trainOpt.method.removeEig.type = 'tol';
+trainOpt.method.removeEig.tol = 0; % default tolerance
 
 trainOpt.accumulate = true;
 trainOpt.printOut = false;
