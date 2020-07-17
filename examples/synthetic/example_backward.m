@@ -126,15 +126,13 @@ opt.removeMean = true;
 % getting XtX and Xty required for model fitting here:
 [XtX,Xty] = LM_crossMatrices(stimOpt,EEGopt,opt,'backward');
 
-% options to fit he model
+% options to fit the model
 trainOpt = struct();
-trainOpt.printOut = false;
-trainOpt.accumulate = true; % input are XtX & Xty, and not X and Y
-trainOpt.method.name = 'ridge-eig-XtX'; % ridge regression
- % normalised regularisation parameter
-trainOpt.method.lambda = 10.^(-6:0.5:6);
-trainOpt.method.removeEig.type = 'tol';
-trainOpt.method.removeEig.tol = 0; % default tolerance
+trainOpt.method.name = 'ridge-eig-XtX'; % use ridge regression
+% regularisation coefficients for which we'll fit the model
+trainOpt.method.lambda = 10.^(-6:0.1:6);
+trainOpt.method.normaliseLambda = true;
+trainOpt.accumulate = true; % the input is XtX & Xty, and not X & y
 
 nLambda = numel(trainOpt.method.lambda);
 nLags = opt.maxLag - opt.minLag + 1;

@@ -8,15 +8,35 @@ function [V,S] = LM_regEigen(X,isXtX,reg)
 % and return V and S (as a vector) sorted by eigenval and with some
 % regularisation.
 %
-% Input X will not be normalised in this function
+% Input X will not be normalised in this function.
 %
+% Input arguments:
+%
+% X: data matrix of size [nPnts,p] or if isXtX == true, covariance matrix
+% (X'*X) of size [p,p].
+%
+% isXtX: boolean indicating whether X is an observation (isXtX == false) or 
+% covariance matrix (isXtX == true). Default is false.
+%
+% reg: structure containing regularisation options. Valid options are:
+%
+% reg.type =
+%   'nKeep': keep reg.n dimensions
+%	'var': keep dimensions accounting up to at most a fraction
+%   reg.var of the total variance
+% 	'tol': keep dimensions associated with an eigenvalue > reg.tol
+%   'cond': keep dimensions up to a condition number < reg.cond
+%   'ridge': transform eigenvalues by S -> S^2 / (S + reg.lambda * meanEigenvalue)
+%
+% Degenerate dimensions associated with null eigenvalues based on default
+% tolerance will always be removed.
 % ------
 if nargin < 2
     isXtX = false;
 end
 
 if isXtX
-    % input matrix is X' * X p precomputed
+    % input matrix is X' * X precomputed
     [V,S] = eig(X,'vector');
 else
     [V,S] = eig(X'*X,'vector');
@@ -26,7 +46,7 @@ end
 [S,iSort] = sort(S,'descend');
 
 % we'll remove at least these (numerical zeros)
-rx = sum(S > eps(S(1)));
+rx = sum( eps(S(1)) < S);
 
 % various criterion to choose how many components to keep
 if 2 < nargin && ~isempty(reg)
@@ -39,15 +59,15 @@ if 2 < nargin && ~isempty(reg)
             
         case 'var'
             % keeping dimensions accounting for a given fraction of variance
-            rx = min( rx, find( cumsum(S)./ sum(S) > reg.var,1)-1 );
+            rx = min( rx, sum( cumsum(S)./ sum(S) <= reg.var ) );
             
         case 'tol'
             % custom tolerance
-            rx = min(rx, sum(S > reg.tol) );
+            rx = min(rx, sum(reg.tol < S) );
             
         case 'cond'
             % condition number
-            rx = min( rx, find(S(1)./S > reg.cond,1)-1 );
+            rx = min( rx, sum( (S(1)./S) < reg.cond ) );
             
         case 'ridge'
             % ridge
