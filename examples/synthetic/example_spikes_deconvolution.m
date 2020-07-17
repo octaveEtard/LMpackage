@@ -69,14 +69,11 @@ Xty = LM_laggedXty(xF,eeg,minLag,maxLag,...
 
 % options to fit the model
 trainOpt = struct();
-trainOpt.method.name = 'ridge-eig-XtX';
+trainOpt.method.name = 'ridge-eig-XtX'; % use ridge regression
 % regularisation coefficients for which we'll fit the model
 trainOpt.method.lambda = 10.^(-6:0.1:6);
-trainOpt.method.removeEig.type = 'tol';
-trainOpt.method.removeEig.tol = 0; % default tolerance
-
-trainOpt.accumulate = true;
-trainOpt.printOut = false;
+trainOpt.method.normaliseLambda = true;
+trainOpt.accumulate = true; % the input is XtX & Xty, and not X & y
 
 % fitting the model
 model = LM_fitLinearModel(XtX,Xty,trainOpt);
@@ -88,8 +85,9 @@ lambda0 = 1e-6; % regularisation coefficient to use;
 [~,iLambda0] = min(abs(lambda0 - trainOpt.method.lambda));
 lambda0 = trainOpt.method.lambda(iLambda0);
 
+
 tms = 1e3 * (-maxLag:-minLag) / Fs;
-nLambda = numel(trainOpt.method.lambda);
+nLambda = size(model.coeffs,3);
 nChan = size(eeg,2);
 
 
