@@ -15,7 +15,7 @@ Please note that the documentation is incomplete at the moment. There are howeve
 ## Quick start
 
 ### Installation
-Add the `functions` folder and subfolders to your path. All function names start with `LM_` so as to reduce the risk of shadowing any of your own functions.
+Add the `functions` folder and subfolders to your path. All function names start with `LM_` so as to reduce the risk of shadowing any of your own functions. The examples require some EEGLAB functions to load the data.
 
 ### Examples
 The `example` folder contains detailed examples illustrating how to use this package. These include:
