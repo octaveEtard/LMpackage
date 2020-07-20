@@ -1,13 +1,21 @@
 % Basic example demonstrating how to use the LM package to fit a linear
 % backward model reconstructing the stimulus based on EEG data.
 %
+idxSID = [2,3]; % subject indices
+% subject IDs
+allSID = arrayfun(@(i) sprintf('P%02i',i),idxSID,'UniformOutput',false);
 
-allSID = {'P02','P03'};
-idxSID = [2,3];
-
+%
+% In this example each EEG file contains responses to 15 different stories,
+% listed below:
 stories = {...
     'AUNP01','AUNP02','AUNP03','AUNP04','AUNP05','AUNP06','AUNP07','AUNP08',...
     'BROP01','BROP02','BROP03','FLOP01','FLOP02','FLOP03','FLOP04'};
+%
+% The matrix below contains the time of stimulus onset for each of the
+% stories and each of the subject (matrix of size nSub x nStories).
+% Stimuli are sorted in alphabetical order.
+alignementFilePath = fullfile(pwd(),'stimuli','all_story_onsets.mat');
 
 nChan = 64;
 Fs = 100;
@@ -45,7 +53,7 @@ stimOpt = {cell(nStories,1)};
 EEGopt = cell(nSub,1);
 
 
-alignementFilePath = fullfile(pwd(),'stimuli','all_story_onsets.mat');
+
 
 for iStory = 1:nStories
     envFileName = sprintf('%s-Fs-%i-%s-%s.mat',procEnv,Fs,typeEnv,stories{iStory});
@@ -66,6 +74,10 @@ opt.nStimPerFile = nStories;
 % These are loading function taking one element of stimOpt and EEGopt
 % respectively as input, and loading stimulus / EEG data.
 opt.getStimulus = @LM_loadFeature_hugo;
+% This function should return as 1st output a [nPnts x nChan] data matrix,
+% and as 2nd outut a vector of indices (size nStimPerFile x 1) indicating
+% where each stimulus begins in the data. These indices should be sorted in
+% the same order as the stimuli returned by opt.getStimulus.
 opt.getResponse = @LM_loadEEG_hugo;
 
 % nb of features describing each stimulus
