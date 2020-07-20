@@ -14,6 +14,7 @@ procEEG = 'BP-1-12-INTP-AVR';
 typeEnv = 'rectified';
 procEnv = 'LP-12';
 
+
 % Time region in which to derive the decoder. Time lag is understood as lag of
 % predictor (here EEG) with respect to predicted data (here stimulus).
 % Hence, here positive time lags correspond to the causal part of the
@@ -60,6 +61,10 @@ opt.nStimPerFile = 1;
 % These are loading function taking one element of stimOpt and EEGopt
 % respectively as input, and loading stimulus / EEG data.
 opt.getStimulus = @LM_loadFeature_octave;
+% This function should return as 1st output a [nPnts x nChan] data matrix,
+% and as 2nd outut a vector of indices (size nStimPerFile x 1) indicating
+% where each stimulus begins in the data. These indices should be sorted in
+% the same order as the stimuli returned by opt.getStimulus.
 opt.getResponse = @LM_loadEEG_octave;
 
 % nb of features describing each stimulus

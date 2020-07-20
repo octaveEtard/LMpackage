@@ -6,7 +6,10 @@ function [data,iB] = LM_loadEEG_octave(c)
 % matrix of size [nPnts,nChannels].
 %
 % It also returns a vector iB containing the indices of stimulus onset for
-% all stimuli of interest. In this case this information is already stored
+% all stimuli of interest. This vector should be sorted in the same order
+% as the function loading features returns them.
+%
+% Here this information is already stored
 % in the EEG dataset.
 %
 c = c{1};
@@ -21,7 +24,7 @@ iEEG(iSound) = []; % actual EEG channels;
 % data matrix, each column = 1 channel
 data = EEG.data(iEEG,:)';
 
-% indices of stimulus onset
+% index of stimulus onset
 eventType = {EEG.event(:).type};
 iB = find(strcmp(eventType, 'storyBegin'), 1);
 
