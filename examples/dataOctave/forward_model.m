@@ -210,8 +210,8 @@ ax.Title.String = 'TRF';
 
 %% Plotting topography
 t0 = 150; % ms 
-it0 = argmin(abs(tms-t0));
-chanLocs = loadChanLocs();
+[~,it0] = min(abs(tms-t0));
+chanLocs = LM_example_loadChanLocs();
 
 figure;
 topoplot(model.coeffs(it0,:,iLambda0),chanLocs);
