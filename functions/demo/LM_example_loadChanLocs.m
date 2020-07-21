@@ -5,7 +5,7 @@ if nargin < 1
 end
 
 % assuming this is run from LMpackage/examples/someExample
-chanLocs = load(fullfile('.',sprintf('chanLocs-%i.mat',nbChan)));
+chanLocs = load(fullfile('..',sprintf('chanLocs-%i.mat',nbChan)));
 chanLocs = chanLocs.chanLocs;
 
 end
