@@ -1,7 +1,7 @@
 # LMpackage
 Octave Etard ( octave.etard11@imperial.ac.uk )
 
-Matlab routines for fitting linear forward / backward models. Tested with Matlab R2019b, but should work with all recent Matlab versions.
+Matlab routines for fitting linear forward / backward models. **Requires Matlab R2019b or newer** (tested on R2019b & R2020a).
 
 
 ## Introduction
@@ -15,7 +15,7 @@ Please note that the documentation is incomplete at the moment. There are howeve
 ## Quick start
 
 ### Installation
-Add the `functions` folder and subfolders to your path. All function names start with `LM_` so as to reduce the risk of shadowing any of your own functions. The examples require some EEGLAB functions to load the data.
+Add the `functions` folder and subfolders to your path. All function names start with `LM_` so as to reduce the risk of shadowing any of your own functions. The examples require some [EEGLAB](https://sccn.ucsd.edu/eeglab/index.php) functions to load the data.
 
 ### Examples
 The `example` folder contains detailed examples illustrating how to use this package. These include:
