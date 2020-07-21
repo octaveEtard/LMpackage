@@ -1,11 +1,6 @@
-function chanLocs = LM_example_loadChanLocs(nbChan)
+function chanLocs = LM_example_loadChanLocs(chanpath)
 
-if nargin < 1
-    nbChan = 64;
-end
-
-% assuming this is run from LMpackage/examples/someExample
-chanLocs = load(fullfile('.',sprintf('chanLocs-%i.mat',nbChan)));
+chanLocs = load(chanpath);
 chanLocs = chanLocs.chanLocs;
 
 end
