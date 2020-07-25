@@ -14,8 +14,9 @@ stories = {...
 %
 % The matrix below contains the time of stimulus onset for each of the
 % stories and each of the subject (matrix of size nSub x nStories).
-% Stimuli are sorted in alphabetical order.
-alignementFilePath = fullfile(pwd(),'stimuli','all_story_onsets.mat');
+% Stimuli are sorted in alphabetical order, that is the same order as the
+% 'stories' variable above.
+alignmentFilePath = fullfile(pwd(),'stimuli','all_story_onsets.mat');
 
 nChan = 64;
 Fs = 100;
@@ -53,8 +54,6 @@ stimOpt = {cell(nStories,1)};
 EEGopt = cell(nSub,1);
 
 
-
-
 for iStory = 1:nStories
     envFileName = sprintf('%s-Fs-%i-%s-%s.mat',procEnv,Fs,typeEnv,stories{iStory});
     stimOpt{1}{iStory} = fullfile(pwd(),'stimuli',envFileName);
@@ -64,7 +63,7 @@ for iSub = 1:nSub
     EEGFolder = fullfile(pwd(),'EEGdata',allSID{iSub});
     EEGFileName = sprintf('%s-Fs-%i-%s.set',procEEG,Fs,allSID{iSub});
     
-    EEGopt{iSub} = {EEGFolder,EEGFileName,alignementFilePath,idxSID(iSub),1:nStories};
+    EEGopt{iSub} = {EEGFolder,EEGFileName,alignmentFilePath,idxSID(iSub),1:nStories};
 end
 
 % options passed to the call to get the appropriate matrices to fit the
