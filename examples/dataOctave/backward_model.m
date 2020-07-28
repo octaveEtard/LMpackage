@@ -113,6 +113,9 @@ nPerfSize = numel(tWinPerf);
 % all the data bar one part. The excluded part subject will be used as
 % testing data.
 
+% Testing value sets for each window duration in tWinPerf, each data part
+% and each subject (number of values in each set will depend on the length
+% of each data part, and duration of each testing window).
 CC = cell(nPerfSize,nParts,nSub);
 MSE = cell(nPerfSize,nParts,nSub);
 
@@ -144,6 +147,7 @@ end
 dur0 = 10;
 iDur0 = find(tWinPerf == dur0,1);
 
+% pooling all the testing results for windows of duration dur0 
 CC0 = vertcat(CC{iDur0,:});
 nWin = size(CC0,1) / nSub;
 CC0 =  reshape(CC0,[nWin,nSub,nLambda]);
