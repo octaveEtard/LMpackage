@@ -2,7 +2,7 @@
 % forward model reconstructing the EEG data based on a stimulus.
 %
 
-allSID = {'YH00','YH01','YH02','YH03','YH04','YH06','YH07','YH08','YH09','YH10','YH11','YH14','YH15','YH16','YH17','YH18','YH19','YH20'};
+allSID = {'YH00','YH01','YH02'};%,'YH03','YH04','YH06','YH07','YH08','YH09','YH10','YH11','YH14','YH15','YH16','YH17','YH18','YH19','YH20'};
 
 parts = 1:4;
 condition = 'clean';
@@ -42,6 +42,11 @@ stimOpt = cell(nParts,1);
 % corresponds to 1 EEG recording per subject.
 EEGopt = cell(nParts,nSub);
 
+% load channel location
+chanLocs = LM_example_loadChanLocs();
+% define a channel order to be used for all data
+chanOrder = {chanLocs(:).labels};
+
 for iPart = 1:nParts
     envFileName = sprintf('env_Fs-%i-%s-%s_%s_%i.mat',Fs,procEnv,typeEnv,condition,iPart);
     stimOpt{iPart} = fullfile(pwd(),'envelopes',envFileName);
@@ -50,7 +55,7 @@ for iPart = 1:nParts
         EEGFolder = fullfile(pwd(),'EEGdata',allSID{iSub});
         EEGFileName = sprintf('%s-Fs-%i-%s_%s_%i.set',procEEG,Fs,allSID{iSub},condition,iPart);
         
-        EEGopt{iPart,iSub} = {EEGFolder,EEGFileName};
+        EEGopt{iPart,iSub} = {EEGFolder,EEGFileName,chanOrder};
     end
 end
 
@@ -211,7 +216,6 @@ ax.Title.String = 'TRF';
 %% Plotting topography
 t0 = 150; % ms 
 [~,it0] = min(abs(tms-t0));
-chanLocs = LM_example_loadChanLocs();
 
 figure;
 topoplot(model.coeffs(it0,:,iLambda0),chanLocs);

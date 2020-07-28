@@ -53,6 +53,10 @@ stimOpt = {cell(nStories,1)};
 % one EEG file per subjects
 EEGopt = cell(nSub,1);
 
+% load channel location
+chanLocs = LM_example_loadChanLocs();
+% define a channel order to be used for all data
+chanOrder = {chanLocs(:).labels};
 
 for iStory = 1:nStories
     envFileName = sprintf('%s-Fs-%i-%s-%s.mat',procEnv,Fs,typeEnv,stories{iStory});
@@ -63,7 +67,8 @@ for iSub = 1:nSub
     EEGFolder = fullfile(pwd(),'EEGdata',allSID{iSub});
     EEGFileName = sprintf('%s-Fs-%i-%s.set',procEEG,Fs,allSID{iSub});
     
-    EEGopt{iSub} = {EEGFolder,EEGFileName,alignmentFilePath,idxSID(iSub),1:nStories};
+    EEGopt{iSub} = {EEGFolder,EEGFileName,chanOrder,...
+        alignmentFilePath,idxSID(iSub),1:nStories};
 end
 
 % options passed to the call to get the appropriate matrices to fit the
@@ -146,7 +151,7 @@ for iSub = 1:nSub
         
         % --- testing on the remaining part
         stim_test = {stimOpt{1}(iTestStory)};
-        EEG_test = {{EEGopt{iSub}{1:4},iTestStory}};
+        EEG_test = {{EEGopt{iSub}{1:5},iTestStory}};
 
         [ CC(:,iTestStory,iSub),...
             MSE(:,iTestStory,iSub)] = LM_testModel(model,stim_test,EEG_test,opt_test,'backward');

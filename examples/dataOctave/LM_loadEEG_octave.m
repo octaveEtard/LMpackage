@@ -16,19 +16,15 @@ c = c{1};
 
 EEG = pop_loadset(c{2},c{1});
 
-% removing 'Sound' channel
-iSound = find(strcmp({EEG.chanlocs(:).labels},'Sound'),1);
-iEEG = 1:EEG.nbchan;
-iEEG(iSound) = []; % actual EEG channels;
-
-% data matrix, each column = 1 channel
-data = EEG.data(iEEG,:)';
-
 % index of stimulus onset
 eventType = {EEG.event(:).type};
 iB = find(strcmp(eventType, 'storyBegin'), 1);
 
 iB = EEG.event(iB).latency;
+
+% data matrix, each column = 1 channel
+% make sure channels are returned in the order specified by c{3}
+data = LM_reorderMatrix(EEG.data,{EEG.chanlocs(:).labels},c{3},1)';
 
 end
 %
