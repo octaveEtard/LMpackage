@@ -21,9 +21,9 @@ for n = [8,10,15]
         minLag = minLags(iLag);
         maxLag = maxLags(iLag);
         
-        for removeMean = true%[true,false]
+        for removeMean = [true,false]
             
-            for padded = false%[false,true]
+            for padded = [false,true]
                 
                 for precomputeYFFT = [false,true]
                     

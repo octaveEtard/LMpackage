@@ -1,12 +1,14 @@
 % Basic example demonstrating how to use the LM package to fit a linear
 % backward model reconstructing the stimulus based on EEG data.
+% Author: Octave Etard
 %
 % The data used in this example is synthetic (see: 'generate_example_data')
 % giving us access to the ground truth
 
 % folder in which the data is stored ; make sure to run
 % 'generate_example_data' before hand, and edit folder name accordingly
-baseDataFolder = 'testing_data_2020_07_08_15_21_11';
+baseDataFolder = 'testing_data_someTimestamp';
+
 % Descritpion of the synthetic data:
 d = load(fullfile(baseDataFolder,'generating_parameter.mat'));
 
@@ -145,14 +147,14 @@ for iCond = 1:nCond
     coeffs(:,:,:,iCond) = reshape(model.coeffs,[nLags,nChan,nLambda]);
 end
 
-coeffs = flip(coeffs,1);
+% Return a time vector associated with the coefficients, and make sure the
+% causal part of the coefficients are at positive latencies.
+[tms,coeffs] = LM_getTime(opt,Fs,'backward',coeffs,1);
+tms = 1e3 * tms; % in milliseconds
 
 
 %% Plotting the decoder 
-% time vector associated with the coefficients, with the causal part at
-% positive latencies.
-tms = 1e3 * LM_getTime(opt,Fs,'backward');
-
+%
 % regularisation coefficient for which to plot the coeffcients
 lambda0 = 1e-6;
 [~,iLambda0] = min(abs(trainOpt.method.lambda-lambda0));

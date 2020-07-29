@@ -1,4 +1,9 @@
-baseDataFolder = 'testing_data_2020_07_07_12_33_25';
+% Testing function part of the Linear Model (LM) package.
+% Author: Octave Etard
+%
+% run 'generate_testing_data' to generate synthetic data first
+% edit folder name
+baseDataFolder = 'testing_data_someTimestamp';
 
 maxDev = zeros(4,1);
 
@@ -47,6 +52,8 @@ trainOpt.printOut = false;
 trainOpt.accumulate = true;
 trainOpt.method.name = 'ridge-eig-XtX';
 trainOpt.method.lambda = 10.^(-6:0.5:6);
+trainOpt.method.normaliseLambda = true;
+% alternatively the following 2 lines could be skipped to use default tol
 trainOpt.method.removeEig.type = 'tol';
 trainOpt.method.removeEig.tol = 0; % default tolerance
 

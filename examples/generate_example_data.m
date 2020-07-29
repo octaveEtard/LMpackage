@@ -1,3 +1,7 @@
+% Generate synthetic data to demonstrate the use of the Linear Model (LM)
+% package.
+% Author: Octave Etard
+%
 nSub = 3;
 nCond = 2;
 nParts = 2;
