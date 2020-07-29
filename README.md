@@ -15,17 +15,12 @@ Please note that the documentation is incomplete at the moment. There are howeve
 ## Quick start
 
 ### Installation
-Add the `functions` (and `functions/demo` if you wish to run the examples) folder(s) to your path. All function names start with `LM_` so as to reduce the risk of shadowing any of your own functions. The examples require some [EEGLAB](https://sccn.ucsd.edu/eeglab/index.php) functions to load the data and show topoplots.
+Add the `functions` (and `functions/demo` if you wish to run the examples) folder(s) to your path. All function names start with `LM_` so as to reduce the risk of shadowing any of your own functions. The examples require some [EEGLAB](https://sccn.ucsd.edu/eeglab/index.php) functions to load the data.
 
 ### Examples
-The `example` folder contains detailed examples illustrating how to use this package. These include:
-
-1. In `examples/synthetic`:
+The `example` folder contains detailed examples illustrating how to use this package based on synthetic data. These include:
 
   - `example_spikes_deconvolution.m` : deconvolution example that showcase the use of the low-level routines.
   - `example_forward.m` & `example_backward.m` : simple fitting of forward/backward models, using the wrapper functions so that one does not have to deal with the lower level functions mentioned above.
 
-
-2. In `example/dataHugo` & `example/dataOctave`:
-
-  - examples for fitting forward/backward models with cross-validation (subject-specific or generic models, depending on the examples) on two different real EEG datasets.
+For more examples, have a look at [LMpackage_examples](https://github.com/octaveEtard/LMpackage_examples), which demonstrates the use of this package to fit forward/backward models with cross-validation (subject-specific or generic models, depending on the examples) on two different real EEG datasets.
