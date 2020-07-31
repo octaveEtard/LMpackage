@@ -5,7 +5,7 @@ Matlab routines for fitting linear forward / backward models. **Requires Matlab 
 
 
 ## Introduction
-This package consists of Matlab routines for fitting linear forward / backward models (deconvolution). This implementation strives for computational and memory efficiency to allow for more flexibility e.g. when fitting large models with high sampling rate, or to form generic cross-validated models faster.
+This package consists of Matlab routines for fitting linear forward / backward models (deconvolution). It implements ridge-regularised linear models, with options to use different norm-2 penalties (e.g. curvature). This implementation strives for computational and memory efficiency to allow for more flexibility e.g. when fitting large models with high sampling rate, or to form generic cross-validated models faster.
 
 It incorporates high-level "wrapper" functions that should make fitting models straightforward, with users needing only to specify functions to read-in the input data.
 
