@@ -23,4 +23,4 @@ The `example` folder contains detailed examples illustrating how to use this pac
   - `example_spikes_deconvolution.m` : deconvolution example that showcase the use of the low-level routines.
   - `example_forward.m` & `example_backward.m` : simple fitting of forward/backward models, using the wrapper functions so that one does not have to deal with the lower level functions mentioned above.
 
-For more examples, have a look at [LMpackage_examples](https://github.com/octaveEtard/LMpackage_examples), which demonstrates the use of this package to fit forward / backward models with cross-validation (subject-specific and generic (population) models) on two different real EEG datasets.
+For more examples, have a look at [LMpackage_examples](https://github.com/octaveEtard/LMpackage_examples), which demonstrates the use of this package to fit forward / backward models with cross-validation (subject-specific and generic (population) models) on real EEG datasets.
