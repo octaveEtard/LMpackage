@@ -144,7 +144,7 @@ nLags = opt.maxLag - opt.minLag + 1;
 coeffs = nan(nLags,nChan,nLambda,nCond);
 for iCond = 1:nCond
     model = LM_fitLinearModel(XtX(:,:,iCond),Xty(:,:,iCond),trainOpt);
-    coeffs(:,:,:,iCond) = reshape(model.coeffs,[nLags,nChan,nLambda]);
+    coeffs(:,:,:,iCond) = reshape(model.coeffs,[nLags,n Chan,nLambda]);
 end
 
 % Return a time vector associated with the coefficients, and make sure the
