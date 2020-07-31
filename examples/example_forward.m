@@ -61,7 +61,7 @@ for iCond = 1:nCond
         
         for iSub = 1:nSub
             EEGopt{iCond,iPart,iSub} = {fullfile(baseDataFolder,'EEG'),...
-                sprintf('sub_%i_cond_%i_part_%i.set',iSub,iCond,iPart)};
+                sprintf('sub_%i_cond_%i_part_%i.mat',iSub,iCond,iPart)};
         end
     end
 end

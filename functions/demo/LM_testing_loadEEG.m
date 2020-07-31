@@ -11,21 +11,34 @@ function [data,iB] = LM_testing_loadEEG(c)
 %
 c = c{1};
 
-EEG = pop_loadset(c{2},c{1});
+% EEG = pop_loadset(c{2},c{1});
+% % data matrix, each column = 1 channel
+% data = EEG.data';
+% 
+% % indices of stimulus onset
+% % event code are integers identifying which stimulus was played
+% eventCode = {EEG.event(:).code};
+% eventCode = [eventCode{:}];
+% 
+% iB = {EEG.event(:).latency};
+% iB = [iB{:}];
+% 
+% % returning iB sorted (same stimulus order, regardless of presentation
+% % order)
+% [~,iSort] = sort(eventCode,'ascend');
+% iB = iB(iSort);
+
+EEG = load(fullfile(c{1},c{2}));
 % data matrix, each column = 1 channel
-data = EEG.data';
+data = EEG.data;
 
 % indices of stimulus onset
-% event code are integers identifying which stimulus was played
-eventCode = {EEG.event(:).code};
-eventCode = [eventCode{:}];
-
-iB = {EEG.event(:).latency};
-iB = [iB{:}];
+% stimBeginIdx are integers identifying which stimulus was played
+iB = EEG.stimBeginIdx;
 
 % returning iB sorted (same stimulus order, regardless of presentation
 % order)
-[~,iSort] = sort(eventCode,'ascend');
+[~,iSort] = sort(EEG.stimID,'ascend');
 iB = iB(iSort);
 
 end

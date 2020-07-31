@@ -31,7 +31,7 @@ for iCond = 1:nCond
     d.tIR = tIR;
     
     saveName = sprintf('IR_cond_%i',iCond);
-    proper_save(d,saveName,fullfile(saveFolder,'IR'));
+    LM_save(d,saveName,fullfile(saveFolder,'IR'));
     % ---
     
     for iPart = 1:nParts
@@ -70,27 +70,16 @@ for iCond = 1:nCond
             
             r = vertcat(r{:});
             
-            %%
-            EEG = eeg_emptyset;
-            EEG.data = r';
-            EEG.trials = 1;
-            EEG.nbchan = size(EEG.data, 1);
-            EEG.pnts = size(EEG.data, 2);
-            EEG.event = struct();
-            EEG.srate = Fs;
+            %% save synhtetic dataset
+            EEG = struct();
+            EEG.data = r;
+            EEG.Fs = Fs;
+            EEG.stimBeginIdx = iB;
+            EEG.stimID = stimOrder;
             
-            for iiStim = 1:nStimPerFile
-                EEG.event(iiStim).latency = iB(iiStim);
-                EEG.event(iiStim).duration = 1/Fs;
-                EEG.event(iiStim).type = 'Stim begin';
-                EEG.event(iiStim).code = stimOrder(iiStim);
-                EEG.event(iiStim).urevent = iiStim;
-                
-            end
-            EEG.setname = sprintf('sub_%i_cond_%i_part_%i',iSub,iCond,iPart);
-            EEG = eeg_checkset(EEG);
+            saveName = sprintf('sub_%i_cond_%i_part_%i',iSub,iCond,iPart);;
+            LM_save(EEG,saveName,saveFolderEEG);
             
-            pop_saveset(EEG,'filename',EEG.setname,'filepath',saveFolderEEG);
         end
     end
 end

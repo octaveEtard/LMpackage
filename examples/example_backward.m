@@ -61,7 +61,7 @@ for iCond = 1:nCond
         
         for iSub = 1:nSub
             EEGopt{iCond,iPart,iSub} = {fullfile(baseDataFolder,'EEG'),...
-                sprintf('sub_%i_cond_%i_part_%i.set',iSub,iCond,iPart)};
+                sprintf('sub_%i_cond_%i_part_%i.mat',iSub,iCond,iPart)};
         end
     end
 end
@@ -144,7 +144,7 @@ nLags = opt.maxLag - opt.minLag + 1;
 coeffs = nan(nLags,nChan,nLambda,nCond);
 for iCond = 1:nCond
     model = LM_fitLinearModel(XtX(:,:,iCond),Xty(:,:,iCond),trainOpt);
-    coeffs(:,:,:,iCond) = reshape(model.coeffs,[nLags,n Chan,nLambda]);
+    coeffs(:,:,:,iCond) = reshape(model.coeffs,[nLags,nChan,nLambda]);
 end
 
 % Return a time vector associated with the coefficients, and make sure the

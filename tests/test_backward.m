@@ -29,7 +29,7 @@ end
 stimOpt = {stimOpt};
 
 EEGopt = {{fullfile(baseDataFolder,'EEG'),...
-    sprintf('sub_%i_cond_%i_part_%i.set',iSub,iCond,iPart)}};
+    sprintf('sub_%i_cond_%i_part_%i.mat',iSub,iCond,iPart)}};
 
 
 opt = struct();
