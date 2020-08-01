@@ -1,11 +1,12 @@
 # LMpackage
 Octave Etard ( octave.etard11@imperial.ac.uk )
 
-Matlab routines for fitting linear forward / backward models. **Requires Matlab R2019b or newer** (tested on R2019b & R2020a).
+Matlab routines for fitting linear forward / backward models.
+**Requires Matlab R2019b or newer** (tested on R2019b & R2020a).
 
 
 ## Introduction
-This package consists of Matlab routines for fitting linear forward / backward models (deconvolution). It implements ridge-regularised linear models, with options to use different norm-2 penalties (e.g. curvature). This implementation strives for computational and memory efficiency to allow for more flexibility e.g. when fitting large models with high sampling rate, or to form generic cross-validated models faster.
+This package consists of Matlab routines for fitting linear forward / backward models (deconvolution). It implements ridge-regularised linear models, with options to use different L2 penalties (e.g. curvature). This implementation strives for computational and memory efficiency to allow for more flexibility e.g. when fitting large models with high sampling rate, or to form generic cross-validated models faster.
 
 It incorporates high-level "wrapper" functions that should make fitting models straightforward, with users needing only to specify functions to read-in the input data.
 
