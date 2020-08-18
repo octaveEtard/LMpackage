@@ -36,11 +36,20 @@ data = EEG.data;
 % stimBeginIdx are integers identifying which stimulus was played
 iB = EEG.stimBeginIdx;
 
-% returning iB sorted (same stimulus order, regardless of presentation
-% order)
-[~,iSort] = sort(EEG.stimID,'ascend');
-iB = iB(iSort);
+% returning iB in a specific stimulus order, regardless of presentation
+% order
 
+if 2 < numel(c)
+    % either:
+    % returning specific stimID only in some given order
+    [iSort,~] = find( c{3}(:)' == EEG.stimID(:) );
+    assert(numel(iSort) == numel(c{3}));
+else
+    % or:
+    % returning all iB, sorted by stimID
+    [~,iSort] = sort(EEG.stimID,'ascend');
+end
+    iB = iB(iSort);
 end
 %
 %

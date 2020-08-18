@@ -47,6 +47,8 @@ if opt.removeMean
     mc(1,:,:,:) = sum(mX .* model,1);
 
     mY = reshape(mY,1,nFeatures);
+else
+    mc = 0;
 end
 
 nPnts = nan(nStimPerFile,1);

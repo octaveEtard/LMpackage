@@ -63,7 +63,7 @@ for padded = [true,false]
     for removeMean = [true,false]
         
         opt.removeMean = removeMean;
-        [XtX,Xty] = LM_crossMatrices(stimOpt,EEGopt,opt,'backward');
+        [XtX,Xty,mX,mY,N] = LM_crossMatrices(stimOpt,EEGopt,opt,'backward');
         % ------
         
         % ------
@@ -107,16 +107,40 @@ for padded = [true,false]
         %         for predBatchSize = [1,ceil(nLambda/3),nLambda]
         predBatchSize = nLambda;
         opt.predBatchSize = predBatchSize;
-        [CC,MSE] = LM_testModel(model.coeffs,stimOpt,EEGopt,opt,'backward');
         
-        CC = squeeze(permute(vertcat(CC{:}),[2,3,1]));
-        MSE = squeeze(permute(vertcat(MSE{:}),[2,3,1]));
+        % --- if using same mean for all stimuli
+        % mX = sum(N .* mX,2) / sum(N);
+        % mY = sum(N .* mY,2) / sum(N);
+        % [CC,MSE] = LM_testModel(model.coeffs,stimOpt,EEGopt,opt,'backward',mX,mY);
+
+        % CC = squeeze(permute(vertcat(CC{:}),[2,3,1]));
+        %  MSE = squeeze(permute(vertcat(MSE{:}),[2,3,1]));
+        
+        % Otherwise, we'll test the stimuli one by one, applying the mean
+        % of each stimulus to itself
+        % Testing this way as it enables us to test for the handling of the
+        % mean
+        CC = nan(opt.nFeatures,nLambda,opt.nStimPerFile);
+        MSE = nan(opt.nFeatures,nLambda,opt.nStimPerFile);
+        
+        opt_ = opt;
+        opt_.nStimPerFile = 1;
+        EEGopt_ = EEGopt;
+        
         
         % --- prediction with the X and y matrices computed ---
         CC_ = nan(opt.nFeatures,nLambda,opt.nStimPerFile);
         MSE_ = nan(opt.nFeatures,nLambda,opt.nStimPerFile);
         
+
         for iStimulus = 1:opt.nStimPerFile
+            
+            % otherwise the same mean is used for all stimuli
+            EEGopt_{1} = [EEGopt{1},iStimulus];
+            [tmp_CC,tmp_MSE] = LM_testModel(model.coeffs,{stimOpt{1}(iStimulus)},EEGopt_,opt_,'backward',mX(:,iStimulus),mY(:,iStimulus));
+            CC(:,:,iStimulus) = tmp_CC{1};
+            MSE(:,:,iStimulus) = tmp_MSE{1};
+            
             n = size(feature{iStimulus},1);
             iB_ = iB(iStimulus);
             if padded
@@ -132,6 +156,9 @@ for padded = [true,false]
             if removeMean
                 X = X - mean(X,1);
                 Y = Y - mean(Y,1);
+                % same mean for all stimuli
+                % X = X - reshape(mX,[1,size(X,2)]);
+                % Y = Y - reshape(mY,[1,size(Y,2)]);
             end
             
             for iLambda = 1:nLambda
@@ -148,8 +175,8 @@ for padded = [true,false]
                 end
             end
         end
-        CC_ = squeeze(CC_);
-        MSE_ = squeeze(MSE_);
+%         CC_ = squeeze(CC_);
+%         MSE_ = squeeze(MSE_);
         % ---
         maxDev(3) = max(maxDev(3),max(abs((CC-CC_) ./ CC_),[],'all'));
         maxDev(4) = max(maxDev(4),max(abs((MSE-MSE_) ./ MSE_),[],'all'));

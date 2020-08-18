@@ -29,7 +29,7 @@ end
 stimOpt = {stimOpt};
 
 EEGopt = {{fullfile(baseDataFolder,'EEG'),...
-        sprintf('sub_%i_cond_%i_part_%i.mat',iSub,iCond,iPart)}};
+    sprintf('sub_%i_cond_%i_part_%i.mat',iSub,iCond,iPart)}};
 
 
 opt = struct();
@@ -63,7 +63,7 @@ for padded = [true,false]
     for removeMean = [true,false]
         
         opt.removeMean = removeMean;
-        [XtX,Xty] = LM_crossMatrices(stimOpt,EEGopt,opt,'forward');
+        [XtX,Xty,mX,mY,N]  = LM_crossMatrices(stimOpt,EEGopt,opt,'forward');
         % ------
         
         % ------
@@ -108,16 +108,38 @@ for padded = [true,false]
         for predBatchSize = [1,ceil(nLambda/3),nLambda]
             
             opt.predBatchSize = predBatchSize;
-            [CC,MSE] = LM_testModel(model.coeffs,stimOpt,EEGopt,opt,'forward');
             
-            CC = permute(vertcat(CC{:}),[2,3,1]);
-            MSE = permute(vertcat(MSE{:}),[2,3,1]);
+            % --- if using same mean for all stimuli
+            % mX_ = sum(N .* mX,2) / sum(N);
+            % mY_ = sum(N .* mY,2) / sum(N);
+            % [CC,MSE] = LM_testModel(model.coeffs,stimOpt,EEGopt,opt,'forward',mX_,mY_);
+            
+            % CC = permute(vertcat(CC{:}),[2,3,1]);
+            % MSE = permute(vertcat(MSE{:}),[2,3,1]);
+            
+            % Otherwise, we'll test the stimuli one by one, applying the mean
+            % of each stimulus to itself
+            % Testing this way as it enables us to test for the handling of the
+            % mean
+            CC = nan(max(nOutModel,opt.nChan),nLambda,opt.nStimPerFile);
+            MSE = nan(max(nOutModel,opt.nChan),nLambda,opt.nStimPerFile);
+            
+            opt_ = opt;
+            opt_.nStimPerFile = 1;
+            EEGopt_ = EEGopt;
             
             % --- prediction with the X and y matrices computed ---
             CC_ = nan(max(nOutModel,opt.nChan),nLambda,opt.nStimPerFile);
             MSE_ = nan(max(nOutModel,opt.nChan),nLambda,opt.nStimPerFile);
             
+
             for iStimulus = 1:opt.nStimPerFile
+                
+                % otherwise the same mean is used for all stimuli
+                EEGopt_{1} = [EEGopt{1},iStimulus];
+                [tmp_CC,tmp_MSE] = LM_testModel(model.coeffs,{stimOpt{1}(iStimulus)},EEGopt_,opt_,'forward',mX(:,iStimulus),mY(:,iStimulus));
+                CC(:,:,iStimulus) = tmp_CC{1};
+                MSE(:,:,iStimulus) = tmp_MSE{1};
                 
                 if padded
                     [xp,yp] = LM_pad(feature{iStimulus},EEG,opt.minLag,opt.maxLag,iB(iStimulus));
@@ -134,8 +156,11 @@ for padded = [true,false]
                 if removeMean
                     X = X - mean(X,1);
                     Y = Y - mean(Y,1);
+                    % same mean for all stimuli
+                    % X = X - reshape(mX_,[1,size(X,2)]);
+                    % Y = Y - reshape(mY_,[1,size(Y,2)]);
                 end
-
+                
                 for iLambda = 1:nLambda
                     pred = X * model.coeffs(:,:,iLambda);
                     
@@ -150,7 +175,7 @@ for padded = [true,false]
                     end
                 end
             end
-
+            
             % ---
             maxDev(3) = max(maxDev(3),max(abs((CC-CC_) ./ CC_),[],'all'));
             maxDev(4) = max(maxDev(4),max(abs((MSE-MSE_) ./ MSE_),[],'all'));
