@@ -1,4 +1,4 @@
-function [XtX,Xty] = LM_backward_crossMatrices(stimOpt,EEGopt,opt)
+function [XtX,Xty,mX,mY,N] = LM_backward_crossMatrices(stimOpt,EEGopt,opt)
 %
 % LM_backward_crossMatrices
 % Part of the Linear Model (LM) package.
@@ -47,8 +47,14 @@ end
 
 %% Precompute feature FFT of each stimulus (same for all subjects)
 nx = nan(nStimPerFile,1);
-mY = cell(nFeatures,1);
-n_mY = nan(nStimPerFile,1);
+
+% number of points (rows) that would be in the equivalent X or Y matrices
+% if opt.sumSub, this needs to be multiplied by nSub
+N = nan(1,nStimPerFile);
+
+mX = nan(nLags*nChan,nStimPerFile,nSub,'double');
+mY = nan(nFeatures,nStimPerFile,'double');
+
 Ytop = cell(nStimPerFile,1);
 Ybottom = cell(nStimPerFile,1);
 
@@ -64,7 +70,7 @@ for iStimulus = 1:nStimPerFile
         opt.unpad.do = true;
     end
     
-    [feature{iStimulus},mY{iStimulus},n_mY(iStimulus),...
+    [feature{iStimulus},mY(:,iStimulus),N(iStimulus),...
         Ytop{iStimulus},Ybottom{iStimulus}] = LM_computeYFFT(feature{iStimulus},minLag,maxLag,nFFT,opt);
 end
 
@@ -83,11 +89,11 @@ for iSub = 1:nSub
             opt.unpad.do = true;
         end
         
-        [XtX_,xF,mX_,Xtop,Xbottom] = LM_laggedXtX(response((1:nx(iStimulus))+iB(iStimulus)-1,:),minLag,maxLag,opt);
+        [XtX_,xF,mX(:,iStimulus,iSub),Xtop,Xbottom] = LM_laggedXtX(response((1:nx(iStimulus))+iB(iStimulus)-1,:),minLag,maxLag,opt);
         
         Xty_ = LM_laggedXty(xF,feature{iStimulus},minLag,maxLag,...
-            mX_,Xtop,Xbottom,...
-            true,mY{iStimulus},n_mY(iStimulus),...
+            mX(:,iStimulus,iSub)',Xtop,Xbottom,...
+            true,mY(:,iStimulus),N(iStimulus),...
             Ytop{iStimulus},Ybottom{iStimulus},...
             opt);
         
@@ -108,6 +114,28 @@ for iSub = 1:nSub
                 Xty(:,:,iStimulus,iSub) = Xty(:,:,iStimulus,iSub) + Xty_;
             end
         end
+    end
+end
+%
+%
+% drop the 1st dimension
+% mX = shiftdim(mX,1);
+% mY = shiftdim(mY,1);
+
+if opt.sumStim
+    mY = sum(N .* mY,2) ./ sum(N,2);
+
+    if opt.sumSub
+        mX = sum(N .* mX,[2,3]) ./ (sum(N,2)*nSub);
+    else
+        mX = sum(N .* mX,2) ./ sum(N,2);
+        mX = permute(mX,[1,3,2]); % drop 2nd dim only
+    end
+    
+    N = sum(N,2);
+else
+    if opt.sumSub
+        mX = sum(mX,3) / nSub;
     end
 end
 %

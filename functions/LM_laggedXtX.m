@@ -1,4 +1,4 @@
-function [XtX,xF,mX,Xtop,Xbottom] = LM_laggedXtX(x,minLag,maxLag,opt)
+function [XtX,xF,mX,Xtop,Xbottom,n_mX] = LM_laggedXtX(x,minLag,maxLag,opt)
 %
 % LM_laggedXtX
 % Part of the Linear Model (LM) package.
@@ -35,36 +35,36 @@ function [XtX,xF,mX,Xtop,Xbottom] = LM_laggedXtX(x,minLag,maxLag,opt)
 % % x and y some time series
 % x = randn(N,3);
 % y = randn(N,4);
-% 
+%
 % iB = 1;
 % minLag = -3;
 % maxLag = 2;
-% 
+%
 % % --- Computing XtX and Xty directly:
 % opt = struct();
 % opt.unpad.do = false;
 % opt.removeMean = true;
-% 
+%
 % [XtX_FFT,xF,mX] = LM_laggedXtX(x,minLag,maxLag,opt);
-% 
+%
 % opt.iB = iB;
 % opt.nx = size(x,1);
-% 
+%
 % Xty_FFT = LM_laggedXty(xF,y,minLag,maxLag,mX,[],[],false,[],[],[],[],opt);
-% 
+%
 % % --- Same as:
 % % Padding:
 % [x,y] = LM_pad(x,y,minLag,maxLag);
-% 
+%
 % X = LM_laggedX(x,minLag,maxLag,iB,size(y,1));
 % Y = LM_laggedY(y,minLag,maxLag,iB,size(x,1));
-% 
+%
 % X = X - mean(X,1);
 % y = y - mean(y,1);
-% 
+%
 % XtX = X' * X;
 % Xty = X' * Y;
-% 
+%
 % % --- Check:
 % max(abs(XtX-XtX_FFT),[],'all')
 % max(abs(Xty-Xty_FFT),[],'all')
@@ -106,15 +106,15 @@ end
 
 
 %%
-% Compute XtX as if the data was not padded by removing the top and bottom
-% padding
-n = nPnts + nLags - 1;
-    
+n_mX = nPnts + nLags - 1;
+
 if opt.unpad.do
+    % Compute XtX as if the data was not padded by removing the top and bottom
+    % padding
     xb = opt.unpad.xb;
     [Xtop,Xbottom] =  LM_topBottomLaggedX(x,xb,opt.unpad.xe,minLag,maxLag);
     XtX = XtX - (Xtop' * Xtop) - (Xbottom' * Xbottom);
-    n = n - size(Xtop,1) - size(Xbottom,1);
+    n_mX = n_mX - size(Xtop,1) - size(Xbottom,1);
 else
     Xtop = []; Xbottom = [];
     xb = [];
@@ -127,11 +127,11 @@ end
 % X = X - mean(X,1); XtX = X' * X;
 %
 if opt.removeMean || 2 < nargout
-    mX = LM_meanLaggedX(xF,nLags,xb,n,opt.unpad.do);
+    mX = LM_meanLaggedX(xF,nLags,xb,n_mX,opt.unpad.do);
 end
 
 if opt.removeMean
-    XtX = XtX - n * (mX' * mX);
+    XtX = XtX - n_mX * (mX' * mX);
 end
 
 end

@@ -1,4 +1,4 @@
-function [CC,MSE] = LM_backward_testModel(model,stimOpt,EEGopt,opt)
+function [CC,MSE] = LM_backward_testModel(model,stimOpt,EEGopt,opt,mX,mY)
 %
 % LM_backward_testModel
 % Part of the Linear Model (LM) package.
@@ -41,6 +41,14 @@ if ~iscell(feature)
     feature = {feature};
 end
 
+if opt.removeMean
+    mc = nan(1,nChan,nOutModel,nReg);
+    mX = reshape(mX,nLags,nChan);
+    mc(1,:,:,:) = sum(mX .* model,1);
+
+    mY = reshape(mY,1,nFeatures);
+end
+
 nPnts = nan(nStimPerFile,1);
 for iStimulus = 1:nStimPerFile
     % same stimuli for all subjects, computing relevant variables here
@@ -53,12 +61,12 @@ for iStimulus = 1:nStimPerFile
     end
     feature{iStimulus} = LM_laggedY(feature{iStimulus},minLag,maxLag,1,n);
     if opt.removeMean
-        feature{iStimulus} = feature{iStimulus}  - mean(feature{iStimulus},1);
+        % feature{iStimulus} = feature{iStimulus}  - mean(feature{iStimulus},1);
+        feature{iStimulus} = feature{iStimulus}  - mY;
     end
 end
 
 
-%%
 for iSub = 1:nSub
     % response should be a matrix of size [~,nOut]
     % iB should be an array with nStimuli elements containing the index
@@ -69,30 +77,34 @@ for iSub = 1:nSub
         nx = nPnts(iStimulus);
         iB_ = iB(iStimulus);
         
+        % ------
+        % The mean is a learning parameter that should be learnt on the
+        % training data if it is to be removed -- otherwise it would
+        % require knowledge of all the testing data beforehand, even if
+        % testing on smaller slices
+        %
+        %         if opt.removeMean
+        %             mc = nan(1,nChan,nOutModel,nReg);
+        %
+        %             % compute the mean of corresponding X matrix
+        %             if opt.unpad.do
+        %                 nFFT = 2^nextpow2( nx + nLags - 1 );
+        %                 xF = fft(response((1:nx)+iB_-1,:),nFFT,1);
+        %                 n = unpad.xe - unpad.xb - nLags + 2;
+        %                 mX = LM_meanLaggedX(xF,nLags,unpad.xb,n,opt.unpad.do);
+        %                 mX = reshape(mX,nLags,nChan);
+        %             else
+        %                 n = nx + nLags - 1;
+        %                 mX = repmat(sum(response((1:nx)+iB_-1,:),1) / n,[nLags,1]);
+        %             end
+        %             mc(1,:,:,:) = sum(mX .* model, 1);
+        %         else
+        %             mc = 0;
+        %         end
+        % ------
+        
         if opt.unpad.do
             unpad = LM_laggedDims(nx,1,nx,minLag,maxLag);
-        end
-        
-        if opt.removeMean
-            mc = nan(1,nChan,nOutModel,nReg);
-            
-            % compute the mean of corresponding X matrix
-            if opt.unpad.do
-                nFFT = 2^nextpow2( nx + nLags - 1 );
-                xF = fft(response((1:nx)+iB_-1,:),nFFT,1);
-                n = unpad.xe - unpad.xb - nLags + 2;
-                mX = LM_meanLaggedX(xF,nLags,unpad.xb,n,opt.unpad.do);
-                mX = reshape(mX,nLags,nChan);
-            else
-                n = nx + nLags - 1;
-                mX = repmat(sum(response((1:nx)+iB_-1,:),1) / n,[nLags,1]);
-            end
-            mc(1,:,:,:) = sum(mX .* model, 1);
-        else
-            mc = 0;
-        end
-        
-        if opt.unpad.do
             pred = squeeze(sum(LM_convfft(response((unpad.xb:unpad.xe)-1+iB_,:),...
                 model,'valid') - mc,2));
         else
@@ -115,7 +127,7 @@ for iSub = 1:nSub
                 MSE{iPerfSize,iStimulus} = nan(nWin,nFeatures,nReg,nSub);
             end
             
-            for iWin = 1:nWin       
+            for iWin = 1:nWin
                 idx = (1:nPntsWin) + (iWin-1) * iWin;
                 
                 if nOutModel == 1

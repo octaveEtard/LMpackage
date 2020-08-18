@@ -1,4 +1,4 @@
-function [Xty,mY] = LM_laggedXty(xF,y,minLag,maxLag,...
+function [Xty,mY,n_mY] = LM_laggedXty(xF,y,minLag,maxLag,...
     mX,Xtop,Xbottom,...
     isYFFT,mY,n_mY,Ytop,Ybottom,...
     opt)
@@ -127,7 +127,7 @@ end
 % y = y - mean(y,1); Xty = X' * y;
 %
 if opt.removeMean
-    Xty = Xty - n_mY * mX' .* mY;
+    Xty = Xty - n_mY * (mX' .* mY);
 end
 
 end

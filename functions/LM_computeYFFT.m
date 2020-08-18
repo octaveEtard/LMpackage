@@ -25,7 +25,7 @@ if opt.unpad.do
         opt.unpad.nZeros_top_y,opt.unpad.nZeros_bottom_y);
 end
 
-if opt.removeMean
+if opt.removeMean || 1 < nargout 
     if opt.unpad.do
         n_mY = opt.unpad.ye - opt.unpad.yb + 1;
         mY = mean(y(opt.unpad.yb:opt.unpad.ye,:),1);

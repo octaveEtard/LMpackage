@@ -1,15 +1,20 @@
-function [CC,MSE] = LM_testModel(model,stimOpt,EEGopt,opt,type)
+function [CC,MSE] = LM_testModel(model,stimOpt,EEGopt,opt,type,mX,mY)
 %
 % LM_testModel
 % Part of the Linear Model (LM) package.
 % Author: Octave Etard
 %
+if nargin < 6
+    mX = [];
+    mY = [];
+end
+
 if numel(stimOpt) == 1
     switch type
         case 'forward'
-            [CC,MSE] = LM_forward_testModel(model,stimOpt,EEGopt,opt);
+            [CC,MSE] = LM_forward_testModel(model,stimOpt,EEGopt,opt,mX,mY);
         case 'backward'
-            [CC,MSE] = LM_backward_testModel(model,stimOpt,EEGopt,opt);
+            [CC,MSE] = LM_backward_testModel(model,stimOpt,EEGopt,opt,mX,mY);
     end
     return;
 end
@@ -54,13 +59,13 @@ for iStimulus = 1:nStimLoad
             [CC(:,:,iStimulus),MSE(:,:,iStimulus)] = LM_forward_testModel(model,...
                 stimOpt(iStimulus),...
                 EEGopt(idxEEGopt + iStimulus),...
-                opt);
+                opt,mX,mY);
             
         case 'backward'
             [CC(:,:,iStimulus),MSE(:,:,iStimulus)] = LM_backward_testModel(model,...
                 stimOpt(iStimulus),...
                 EEGopt(idxEEGopt + iStimulus),...
-                opt);
+                opt,mX,mY);
     end
 end
 CC = reshape(CC,[nPerfSize,nStimPerFile,sizeStim]);

@@ -1,4 +1,4 @@
-function [CC,MSE] = LM_forward_testModel(model,stimOpt,EEGopt,opt)
+function [CC,MSE] = LM_forward_testModel(model,stimOpt,EEGopt,opt,mX,mY)
 %
 % LM_forward_testModel
 % Part of the Linear Model (LM) package.
@@ -54,6 +54,12 @@ if ~iscell(feature)
     feature = {feature};
 end
 
+if opt.removeMean
+    mc = nan(1,nFeatures,nOutModel,nReg);
+    mX = reshape(mX,nLags,nFeatures);
+    mY = reshape(mY,1,nChan);
+    mc(1,:,:,:) = sum(mX .* model,1);
+end
 
 for iSub = 1:nSub
     % response should be a matrix of size [~,nOut]
@@ -64,28 +70,36 @@ for iSub = 1:nSub
     for iStimulus = 1:nStimPerFile
         nx = size(feature{iStimulus},1);
         
-        if opt.removeMean
-            mc = nan(1,nFeatures,nOutModel,nReg);
-            
-            % compute the mean of corresponding X matrix
-            if opt.unpad.do
-                nFFT = 2^nextpow2( nx + nLags - 1 );
-                xF = fft(feature{iStimulus},nFFT,1);
-                % assuming opt.unpad.xb == 1 && opt.unpad.xe == nx ;
-                % that is, enough response data such that full stimulus
-                % lenght can be used given the specified lags
-                % n = opt.unpad.xe - opt.unpad.xb - nLags + 2;
-                n = nx - 1 - nLags + 2;
-                
-                mX = LM_meanLaggedX(xF,nLags,1,n,opt.unpad.do);
-                mX = reshape(mX,nLags,nFeatures);
-            else
-                n = nx + nLags - 1;
-                mX = repmat(sum(feature{iStimulus},1)/ n,[nLags,1]);
-            end
-            mc(1,:,:,:) = sum(mX .* model,1);
-        end
-        
+        % ------
+        % The mean is a learning parameter that should be learnt on the
+        % training data if it is to be removed -- otherwise it would
+        % require knowledge of all the testing data beforehand, even if
+        % testing on smaller slices
+        %
+        %         % FIXME no need to repeat these calculations for all sub
+        %         if opt.removeMean
+        %             mc = nan(1,nFeatures,nOutModel,nReg);
+        %
+        %             % compute the mean of corresponding X matrix
+        %             if opt.unpad.do
+        %                 nFFT = 2^nextpow2( nx + nLags - 1 );
+        %                 xF = fft(feature{iStimulus},nFFT,1);
+        %                 % assuming opt.unpad.xb == 1 && opt.unpad.xe == nx ;
+        %                 % that is, enough response data such that full stimulus
+        %                 % lenght can be used given the specified lags
+        %                 % n = opt.unpad.xe - opt.unpad.xb - nLags + 2;
+        %                 n = nx - 1 - nLags + 2;
+        %
+        %                 mX = LM_meanLaggedX(xF,nLags,1,n,opt.unpad.do);
+        %                 mX = reshape(mX,nLags,nFeatures);
+        %             else
+        %                 n = nx + nLags - 1;
+        %                 mX = repmat(sum(feature{iStimulus},1)/ n,[nLags,1]);
+        %             end
+        %
+        %             mc(1,:,:,:) = sum(mX .* model,1);
+        %         end
+        % ------
         
         for iBatch = 1:nBatch
             %
@@ -129,7 +143,9 @@ for iSub = 1:nSub
             y = LM_laggedY(y,minLag,maxLag,iB_,n);
             
             if opt.removeMean
-                y = y - mean(y,1);
+                % Same as before, mean should be learnt
+                % y = y - mean(y,1);
+                y = y - mY;
             end
             
             
