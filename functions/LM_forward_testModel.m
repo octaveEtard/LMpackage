@@ -57,7 +57,14 @@ end
 if opt.removeMean
     mc = nan(1,nFeatures,nOutModel,nReg);
     mX = reshape(mX,nLags,nFeatures);
-    mY = reshape(mY,1,nChan);
+    if numel(mY) == nChan
+        mY = reshape(mY,1,nChan);
+    elseif numel(mY) == 1
+        % in that case using the same mean for all channels
+        mY = mY * ones(1,nChan);
+    else
+        error('The size of mY does not match');
+    end
     mc(1,:,:,:) = sum(mX .* model,1);
 end
 
