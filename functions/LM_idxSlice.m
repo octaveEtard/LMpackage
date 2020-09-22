@@ -11,7 +11,7 @@ if sumFrom == 1
 end
 
 % indices corresponding to iLinear
-% (we need the cell trick to deala with the varargout & varargin situation)
+% (we need the cell trick to deal with the varargout & varargin situation)
 idx = cell(numel(sizeVec),1);
 [idx{:}] = ind2sub(sizeVec,iLinear);
 

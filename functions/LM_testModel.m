@@ -30,13 +30,7 @@ assert( all( size(EEGopt) == [sizeStim,nSub] ),...
     'stimOpt & EEGopt dimensions do not match!');
 
 nStimLoad = numel(stimOpt);
-
-if 1 < nStimLoad && numel(opt.nStimPerFile) == 1
-    % expands
-    nStimPerFile = opt.nStimPerFile * ones(nStimLoad,1);
-else
-    nStimPerFile = opt.nStimPerFile;
-end
+nStimPerFile = opt.nStimPerFile;
 
 % number of points to use to measure correlation / MSE
 nPntsPerf = opt.nPntsPerf;
@@ -52,8 +46,6 @@ idxEEGopt = nStimLoad * ((1:nSub)-1);
 
 for iStimulus = 1:nStimLoad
     
-    opt.nStimPerFile = nStimPerFile(iStimulus);
-    
     switch type
         case 'forward'
             [CC(:,:,iStimulus),MSE(:,:,iStimulus)] = LM_forward_testModel(model,...
@@ -68,8 +60,9 @@ for iStimulus = 1:nStimLoad
                 opt,mX,mY);
     end
 end
+
 CC = reshape(CC,[nPerfSize,nStimPerFile,sizeStim]);
-MSE = reshape(CC,[nPerfSize,nStimPerFile,sizeStim]);
+MSE = reshape(MSE,[nPerfSize,nStimPerFile,sizeStim]);
 
 end
 %
