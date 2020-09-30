@@ -52,7 +52,7 @@ for iCond = 1:nCond
             d.Fs = Fs;
             
             saveName = sprintf('feature_cond_%i_part_%i_stim_%i',iCond,iPart,iStim);
-            proper_save(d,saveName,fullfile(saveFolder,'features'));
+            LM.save(d,saveName,fullfile(saveFolder,'features'));
             % ---
         end
         

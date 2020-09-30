@@ -40,7 +40,7 @@ if 0 < maxMem && nd < ndims_y
     
     if ismatrix(y) % ndims(y) == 2
         nBatch = ceil(ndims_y / nd);
-        bSize = distribute(ndims_y,nBatch);
+        bSize = LM.distribute(ndims_y,nBatch);
         
         ie = 0;
         
