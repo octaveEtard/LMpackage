@@ -15,7 +15,6 @@ durStim = 3 * 60;
 
 nEdges = ceil(5 * Fs);
 
-
 % will timestamp the data generated
 timeStamp = datestr(now,'yyyy_mm_dd_HH_MM_SS');
 saveFolder = sprintf('testing_data_%s',timeStamp);
@@ -27,8 +26,9 @@ end
 
 
 for iCond = 1:nCond
-    
-    [impResponse,tIR] = LM_testing_makeIR(iCond,Fs);
+
+    % max latency = 400 ms
+    [impResponse,tIR] = LM.test.exampleIR(iCond,Fs);
     
     % --- saving
     d = struct();
@@ -37,7 +37,7 @@ for iCond = 1:nCond
     d.tIR = tIR;
     
     saveName = sprintf('IR_cond_%i',iCond);
-    LM_save(d,saveName,fullfile(saveFolder,'IR'));
+    LM.save(d,saveName,fullfile(saveFolder,'IR'));
     % ---
     
     for iPart = 1:nParts
@@ -48,7 +48,7 @@ for iCond = 1:nCond
             
             % making the stimuli all a different duration
             durStim_ = durStim + randi(10,1,1);
-            features{iStim} = LM_testing_makeFeature_continuous(durStim_,Fs,0.5);
+            features{iStim} = LM.test.makeFeature_continuous(durStim_,Fs,0.5);
             
             % --- saving
             d = struct();
@@ -56,7 +56,7 @@ for iCond = 1:nCond
             d.Fs = Fs;
             
             saveName = sprintf('feature_cond_%i_part_%i_stim_%i',iCond,iPart,iStim);
-            LM_save(d,saveName,fullfile(saveFolder,'features'));
+            LM.save(d,saveName,fullfile(saveFolder,'features'));
             % ---
         end
         
@@ -68,7 +68,7 @@ for iCond = 1:nCond
             r = cell(nStimPerFile,1);
             
             for iiStim = 1:nStimPerFile
-                [r{iiStim},iB(iiStim)] = LM_testing_makeResponse(features{stimOrder(iiStim)},impResponse,nEdges,nChan,noiseAmp);
+                [r{iiStim},iB(iiStim)] = LM.test.makeResponse(features{stimOrder(iiStim)},impResponse,nEdges,nChan,noiseAmp);
             end
             
             n = cellfun(@(m) size(m,1), r);
@@ -84,8 +84,8 @@ for iCond = 1:nCond
             EEG.stimID = stimOrder;
             
             saveName = sprintf('sub_%i_cond_%i_part_%i',iSub,iCond,iPart);;
-            LM_save(EEG,saveName,saveFolderEEG);
-
+            LM.save(EEG,saveName,saveFolderEEG);
+            
         end
     end
 end
@@ -105,6 +105,6 @@ d.durStim = durStim;
 d.nEdges = nEdges;
 
 saveName = 'generating_parameter.mat';
-LM_save(d,saveName,saveFolder);
+LM.save(d,saveName,saveFolder);
 %
 %

@@ -17,7 +17,7 @@ tEEG = ((1:nPnts)-1)/Fs;
 tISI = 250e-3; % in s, spacing betwen events
 jitter = 50e-3; % in s, event jiter
 
-feature = LM_testing_makeFeature_spikes(tMax,Fs,tISI,jitter);
+feature = LM.test.makeFeature_spikes(tMax,Fs,tISI,jitter);
 
 
 %% Ground truth response
@@ -30,18 +30,18 @@ type = 1;
 % --- bi-modal response
 % type = 2;
 
-[impResponse,tResponse,nMaxResponse] = LM_testing_makeIR(type,Fs);
+[impResponse,tResponse,nMaxResponse] = LM.test.exampleIR(type,Fs);
 
 
 %% Creating the synthetic EEG / response
 noiseAmp = 0.5; % noise amplitude (1 = same as max of IR)
 
-[eeg,iB] = LM_testing_makeResponse(feature,impResponse,0,1,0);
+[eeg,iB] = LM.test.makeResponse(feature,impResponse,0,1,0);
 
 % 1 st col: ideal EEG, no noise
 % 2 nd col: EEG + noise
 eeg = [...
-    eeg, LM_testing_makeResponse(feature,impResponse,0,1,noiseAmp)];
+    eeg, LM.test.makeResponse(feature,impResponse,0,1,noiseAmp)];
 
 
 %% Deconvolving the stimulus from the EEG data to uncover the neural
@@ -55,14 +55,14 @@ maxLag = nMaxResponse;
 % forming XtX and Xty:
 opt = struct();
 opt.removeMean = true;
-opt.unpad = LM_laggedDims(size(feature,1),iB,size(eeg,1),minLag,maxLag);
+opt.unpad = LM.laggedDims(size(feature,1),iB,size(eeg,1),minLag,maxLag);
 opt.unpad.do = false;
 
-[XtX,xF,mX,Xtop,Xbottom] = LM_laggedXtX(feature,minLag,maxLag,opt);
+[XtX,xF,mX,Xtop,Xbottom] = LM.laggedXtX(feature,minLag,maxLag,opt);
 opt.iB = iB;
 opt.nx = size(feature,1);
 
-Xty = LM_laggedXty(xF,eeg,minLag,maxLag,...
+Xty = LM.laggedXty(xF,eeg,minLag,maxLag,...
     mX,Xtop,Xbottom,...
     false,[],[],[],[],...
     opt);
@@ -76,7 +76,7 @@ trainOpt.method.normaliseLambda = true;
 trainOpt.accumulate = true; % the input is XtX & Xty, and not X & y
 
 % fitting the model
-model = LM_fitLinearModel(XtX,Xty,trainOpt);
+model = LM.fitLinearModel(XtX,Xty,trainOpt);
 
 
 %% Plotting the results

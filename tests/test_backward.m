@@ -3,6 +3,7 @@
 %
 % run 'generate_testing_data' to generate synthetic data first
 % edit folder name
+
 baseDataFolder = 'testing_data_someTimestamp';
 
 maxDev = zeros(4,1);
@@ -34,8 +35,8 @@ EEGopt = {{fullfile(baseDataFolder,'EEG'),...
 
 opt = struct();
 opt.nStimPerFile = nStimPerFile;
-opt.getStimulus = @LM_testing_loadFeature;
-opt.getResponse = @LM_testing_loadEEG;
+opt.getStimulus = @LM.test.loadFeature;
+opt.getResponse = @LM.test.loadEEG;
 
 opt.sumSub = false;
 opt.sumStim = false;
@@ -63,25 +64,25 @@ for padded = [true,false]
     for removeMean = [true,false]
         
         opt.removeMean = removeMean;
-        [XtX,Xty,mX,mY,N] = LM_crossMatrices(stimOpt,EEGopt,opt,'backward');
+        [XtX,Xty,mX,mY,N] = LM.crossMatrices(stimOpt,EEGopt,opt,'backward');
         % ------
         
         % ------
-        feature = LM_testing_loadFeature(stimOpt);
-        [EEG,iB] = LM_testing_loadEEG(EEGopt);
+        feature = LM.test.loadFeature(stimOpt);
+        [EEG,iB] = LM.test.loadEEG(EEGopt);
         
         for iStimulus = 1:opt.nStimPerFile
             n = size(feature{iStimulus},1);
             iB_ = iB(iStimulus);
             if padded
-                [xp,yp] = LM_pad(EEG((1:n)-1+iB_,:),feature{iStimulus},opt.minLag,opt.maxLag,1);
+                [xp,yp] = LM.pad(EEG((1:n)-1+iB_,:),feature{iStimulus},opt.minLag,opt.maxLag,1);
             else
                 xp = EEG((1:n)-1+iB_,:);
                 yp = feature{iStimulus};
             end
             
-            X = LM_laggedX(xp,opt.minLag,opt.maxLag,1,size(yp,1));
-            Y = LM_laggedY(yp,opt.minLag,opt.maxLag,1,size(xp,1));
+            X = LM.laggedX(xp,opt.minLag,opt.maxLag,1,size(yp,1));
+            Y = LM.laggedY(yp,opt.minLag,opt.maxLag,1,size(xp,1));
             
             if removeMean
                 X = X - mean(X,1);
@@ -101,7 +102,7 @@ for padded = [true,false]
         XtX = sum(XtX,3);
         Xty = sum(Xty,3);
         
-        model = LM_fitLinearModel(XtX,Xty,trainOpt);
+        model = LM.fitLinearModel(XtX,Xty,trainOpt);
         [nOutModel,nLambda] = size(model.coeffs,[2,3]);
         
         %         for predBatchSize = [1,ceil(nLambda/3),nLambda]
@@ -111,7 +112,7 @@ for padded = [true,false]
         % --- if using same mean for all stimuli
         % mX = sum(N .* mX,2) / sum(N);
         % mY = sum(N .* mY,2) / sum(N);
-        % [CC,MSE] = LM_testModel(model.coeffs,stimOpt,EEGopt,opt,'backward',mX,mY);
+        % [CC,MSE] = LM.testModel(model.coeffs,stimOpt,EEGopt,opt,'backward',mX,mY);
 
         % CC = squeeze(permute(vertcat(CC{:}),[2,3,1]));
         %  MSE = squeeze(permute(vertcat(MSE{:}),[2,3,1]));
@@ -137,21 +138,21 @@ for padded = [true,false]
             
             % otherwise the same mean is used for all stimuli
             EEGopt_{1} = [EEGopt{1},iStimulus];
-            [tmp_CC,tmp_MSE] = LM_testModel(model.coeffs,{stimOpt{1}(iStimulus)},EEGopt_,opt_,'backward',mX(:,iStimulus),mY(:,iStimulus));
+            [tmp_CC,tmp_MSE] = LM.testModel(model.coeffs,{stimOpt{1}(iStimulus)},EEGopt_,opt_,'backward',mX(:,iStimulus),mY(:,iStimulus));
             CC(:,:,iStimulus) = tmp_CC{1};
             MSE(:,:,iStimulus) = tmp_MSE{1};
             
             n = size(feature{iStimulus},1);
             iB_ = iB(iStimulus);
             if padded
-                [xp,yp] = LM_pad(EEG((1:n)-1+iB_,:),feature{iStimulus},opt.minLag,opt.maxLag,1);
+                [xp,yp] = LM.pad(EEG((1:n)-1+iB_,:),feature{iStimulus},opt.minLag,opt.maxLag,1);
             else
                 xp = EEG((1:n)-1+iB_,:);
                 yp = feature{iStimulus};
             end
             
-            X = LM_laggedX(xp,opt.minLag,opt.maxLag,1,size(yp,1));
-            Y = LM_laggedY(yp,opt.minLag,opt.maxLag,1,size(xp,1));
+            X = LM.laggedX(xp,opt.minLag,opt.maxLag,1,size(yp,1));
+            Y = LM.laggedY(yp,opt.minLag,opt.maxLag,1,size(xp,1));
             
             if removeMean
                 X = X - mean(X,1);

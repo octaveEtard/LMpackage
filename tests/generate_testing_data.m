@@ -20,9 +20,11 @@ end
 
 nEdges = ceil(5 * Fs);
 
+
 for iCond = 1:nCond
     
-    [impResponse,tIR] = LM_testing_makeIR(iCond,Fs);
+    % max latency = 400 ms
+    [impResponse,tIR] = LM.test.exampleIR(iCond,Fs);
     
     % --- saving
     d = struct();
@@ -31,7 +33,7 @@ for iCond = 1:nCond
     d.tIR = tIR;
     
     saveName = sprintf('IR_cond_%i',iCond);
-    LM_save(d,saveName,fullfile(saveFolder,'IR'));
+    LM.save(d,saveName,fullfile(saveFolder,'IR'));
     % ---
     
     for iPart = 1:nParts
@@ -42,7 +44,7 @@ for iCond = 1:nCond
             
             % making the stimuli all a different duration
             durStim_ = durStim + randi(10,1,1);
-            features{iStim} = LM_testing_makeFeature_continuous(durStim_,Fs,0.5);
+            features{iStim} = LM.test.makeFeature_continuous(durStim_,Fs,0.5);
             
             % --- saving
             d = struct();
@@ -62,7 +64,7 @@ for iCond = 1:nCond
             r = cell(nStimPerFile,1);
             
             for iiStim = 1:nStimPerFile
-                [r{iiStim},iB(iiStim)] = LM_testing_makeResponse(features{stimOrder(iiStim)},impResponse,nEdges,nChan,noiseAmp);
+                [r{iiStim},iB(iiStim)] = LM.test.makeResponse(features{stimOrder(iiStim)},impResponse,nEdges,nChan,noiseAmp);
             end
             
             n = cellfun(@(m) size(m,1), r);
@@ -78,7 +80,7 @@ for iCond = 1:nCond
             EEG.stimID = stimOrder;
             
             saveName = sprintf('sub_%i_cond_%i_part_%i',iSub,iCond,iPart);;
-            LM_save(EEG,saveName,saveFolderEEG);
+            LM.save(EEG,saveName,saveFolderEEG);
             
         end
     end

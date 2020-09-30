@@ -72,8 +72,8 @@ opt = struct();
 opt.nStimPerFile = nStimPerFile;
 % These are loading function taking one element of stimOpt and EEGopt
 % respectively as input, and loading stimulus / EEG data.
-opt.getStimulus = @LM_testing_loadFeature;
-opt.getResponse = @LM_testing_loadEEG;
+opt.getStimulus = @LM.test.loadFeature;
+opt.getResponse = @LM.test.loadEEG;
 
 % nb of features describing each stimulus
 opt.nFeatures = 1;
@@ -126,7 +126,7 @@ opt.unpad.do = false;
 opt.removeMean = true;
 
 % getting XtX and Xty required for model fitting here:
-[XtX,Xty] = LM_crossMatrices(stimOpt,EEGopt,opt,'backward');
+[XtX,Xty] = LM.crossMatrices(stimOpt,EEGopt,opt,'backward');
 
 % options to fit the model
 trainOpt = struct();
@@ -143,13 +143,13 @@ nLags = opt.maxLag - opt.minLag + 1;
 % coefficients
 coeffs = nan(nLags,nChan,nLambda,nCond);
 for iCond = 1:nCond
-    model = LM_fitLinearModel(XtX(:,:,iCond),Xty(:,:,iCond),trainOpt);
+    model = LM.fitLinearModel(XtX(:,:,iCond),Xty(:,:,iCond),trainOpt);
     coeffs(:,:,:,iCond) = reshape(model.coeffs,[nLags,nChan,nLambda]);
 end
 
 % Return a time vector associated with the coefficients, and make sure the
 % causal part of the coefficients are at positive latencies.
-[tms,coeffs] = LM_getTime(opt,Fs,'backward',coeffs,1);
+[tms,coeffs] = LM.getTime(opt,Fs,'backward',coeffs,1);
 tms = 1e3 * tms; % in milliseconds
 
 

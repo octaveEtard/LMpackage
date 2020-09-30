@@ -36,16 +36,16 @@ for n = [8,10,15]
                         
                         if ~padded
                             % only required if unpadding
-                            opt.unpad = LM_laggedDims(size(x,1),iB,size(y,1),minLag,maxLag);
+                            opt.unpad = LM.laggedDims(size(x,1),iB,size(y,1),minLag,maxLag);
                         end
                         opt.unpad.do = ~padded;
                         
-                        [XtX_FFT,xF,mX,Xtop,Xbottom] = LM_laggedXtX(x,minLag,maxLag,opt);
+                        [XtX_FFT,xF,mX,Xtop,Xbottom] = LM.laggedXtX(x,minLag,maxLag,opt);
                         opt.iB = iB;
                         opt.nx = size(x,1);
                         
                         if precomputeYFFT
-                            [y_,mY,n_mY,Ytop,Ybottom] = LM_computeYFFT(y,minLag,maxLag,size(xF,1),opt);
+                            [y_,mY,n_mY,Ytop,Ybottom] = LM.computeYFFT(y,minLag,maxLag,size(xF,1),opt);
                         else
                             y_ = y;
                             n_mY = [];
@@ -54,7 +54,7 @@ for n = [8,10,15]
                             Ybottom = [];
                         end
                         
-                        Xty_FFT = LM_laggedXty(xF,y_,minLag,maxLag,...
+                        Xty_FFT = LM.laggedXty(xF,y_,minLag,maxLag,...
                             mX,Xtop,Xbottom,...
                             precomputeYFFT,mY,n_mY,Ytop,Ybottom,...
                             opt);
@@ -62,7 +62,7 @@ for n = [8,10,15]
                         %% or
                         % [2] --- forming X and Y matrices and then XtX & Xty
                         if padded
-                            [xp,yp] = LM_pad(x,y,minLag,maxLag,iB);
+                            [xp,yp] = LM.pad(x,y,minLag,maxLag,iB);
                             iB_ = 1;
                         else
                             xp = x;
@@ -70,8 +70,8 @@ for n = [8,10,15]
                             iB_ = iB;
                         end
                         
-                        X = LM_laggedX(xp,minLag,maxLag,iB_,size(yp,1));
-                        Y = LM_laggedY(yp,minLag,maxLag,iB_,size(xp,1));
+                        X = LM.laggedX(xp,minLag,maxLag,iB_,size(yp,1));
+                        Y = LM.laggedY(yp,minLag,maxLag,iB_,size(xp,1));
                         
                         if removeMean
                             X = X - mean(X,1);
@@ -108,12 +108,12 @@ for n = [8,10,15]
                         end
                         
                         if padded
-                            pred_fft = squeeze(sum(LM_convfft(x,coeffs,'full') - m,2));
+                            pred_fft = squeeze(sum(LM.convfft(x,coeffs,'full') - m,2));
                         else
                             xb = opt.unpad.xb;
                             xe = opt.unpad.xe;
                             x_ = x(xb:xe,:);
-                            pred_fft = squeeze(sum(LM_convfft(x_,coeffs,'valid') - m,2));
+                            pred_fft = squeeze(sum(LM.convfft(x_,coeffs,'valid') - m,2));
                         end
                         maxDev_pred = max(maxDev_pred, max(abs(pred-pred_fft),[],'all'));
 
