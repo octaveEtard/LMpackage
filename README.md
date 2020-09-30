@@ -15,7 +15,8 @@ It incorporates high-level "wrapper" functions that should make fitting models s
 ## Quick start
 
 ### Installation
-Add the `functions` folder to your path. The code is structured as a [Matlab package](https://uk.mathworks.com/help/matlab/matlab_oop/scoping-classes-with-packages.html) contained in `functions/+LM` to reduce the risk of shadowing any of your own functions. Functions can be called by using the `LM.` prefix (e.g. `out = LM.someFunction(x,y,z)`). Alternatively the required functions can also be [imported](https://uk.mathworks.com/help/matlab/matlab_oop/importing-classes.html). Note a large number of calls of the type `LM.someFunction` in a **script** can lead to decreased performance. This can be fixed by encapsulating the calls in a function or by importing the relevant functions.
+Add the `functions` folder to your path. The code is structured as a [Matlab package](https://uk.mathworks.com/help/matlab/matlab_oop/scoping-classes-with-packages.html) contained in `functions/+LM` to reduce the risk of shadowing any of your own functions. Functions can be called by using the `LM.` prefix (e.g. `out = LM.someFunction(x,y,z)`). Alternatively the required functions can also be [imported](https://uk.mathworks.com/help/matlab/matlab_oop/importing-classes.html) (e.g. `import LM.someFunction; out = someFunction(x,y,z)`).
+Note a large number of calls of the type `LM.someFunction` in a **script** can lead to decreased performance. This can be fixed by encapsulating the calls in a function or by importing the relevant functions.
 
 ### Examples
 The `example` folder contains detailed examples illustrating how to use this package based on synthetic data. These include:
