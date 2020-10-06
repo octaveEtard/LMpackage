@@ -1,6 +1,6 @@
 function [Ax,Ay,Q] = CCA(x,y,opt)
 %
-% CCA
+% LM.CCA
 % Part of the Linear Model (LM) package.
 % Author: Octave Etard
 %
