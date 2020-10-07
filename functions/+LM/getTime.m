@@ -1,8 +1,8 @@
 function [t,coeffs] = getTime(opt,Fs,type,coeffs,timeDim)
 %
-% getTime
+% LM.getTime
 % Part of the Linear Model (LM) package.
-% Author: Octave Etard
+% Author: Octave Etard, 2020
 %
 % Return a time vector, and coeff such that the causal part of the
 % coefficients are at positive latencies. timeDim is the dimension
