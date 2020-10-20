@@ -1,5 +1,5 @@
 # LMpackage
-Octave Etard ( octave.etard11@imperial.ac.uk )
+Octave Etard (octave.etard11@imperial.ac.uk)
 
 Matlab routines for fitting linear forward / backward models.
 
