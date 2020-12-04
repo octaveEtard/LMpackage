@@ -23,6 +23,8 @@ end
 
 
 %% regularised PCA
+% TODO use LM.laggedXtX to compute this more efficiently if input is time
+% series and lagged features is the goal
 [V,S] = LM.regEigen(x, false, opt.x);
 [N,O] = LM.regEigen(y, false, opt.y);
 
@@ -31,6 +33,8 @@ end
 S = 1 ./ sqrt(S);
 O = 1 ./ sqrt(O);
 
+% TODO use LM.laggedXty to compute y' * x more efficiently if input is time
+% series and lagged features is the goal
 % C = diag(O) * N' * y' * x * V * diag(S);
 [P,Q,R] = svd( O .* (N' * (y' * x) * V) .* S','econ');
 % returning a vector
