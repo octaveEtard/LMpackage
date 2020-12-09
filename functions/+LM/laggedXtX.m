@@ -72,11 +72,17 @@ function [XtX,xF,mX,Xtop,Xbottom,n_mX] = laggedXtX(x,minLag,maxLag,opt)
 %%
 [nPnts,nFeatures] = size(x);
 nLags = maxLag - minLag + 1;
+% explicit padding value
+if isfield(opt,'nPad')
+    nPad = opt.nPad;
+else
+    nPad = nLags - 1; % default value (non-periodic, zero padded signal)
+end
 
 XtX = nan(nLags*nFeatures,nLags*nFeatures,'like',x);
 
 
-nFFT = 2^nextpow2( nPnts + nLags - 1 );
+nFFT = 2^nextpow2( nPnts + nPad );
 xF = fft(x,nFFT,1);
 
 % XtX = X' * X
@@ -106,7 +112,7 @@ end
 
 
 %%
-n_mX = nPnts + nLags - 1;
+n_mX = nPnts + nPad;
 
 if opt.unpad.do
     % Compute XtX as if the data was not padded by removing the top and bottom

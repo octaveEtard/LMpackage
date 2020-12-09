@@ -1,17 +1,18 @@
-function [XtX,Xty,mX,mY,N] = forward_crossMatrices(stimOpt,EEGopt,opt)
+function [XtX,Xty,mX,mY,N,yty] = CCA_crossMatrices(stimOpt,EEGopt,opt)
 %
-% LM.forward_crossMatrices
+% LM.CCA_crossMatrices
 % Part of the Linear Model (LM) package.
 % Author: Octave Etard
 %
-% Form forward matrices for one element of stimOpt. If 1 < numel(stimOpt),
-% see LM.crossMatrices that iterates over stimOpt.
+% CCA matrices with X: stimulus ; y: response
 %
-% See also LM.backward_crossMatrices
-%
-minLag = opt.minLag;
-maxLag = opt.maxLag;
-nLags = maxLag - minLag + 1;
+minLag_s = opt.stimulus.minLag;
+maxLag_s = opt.stimulus.maxLag;
+nLags_s = maxLag_s - minLag_s + 1;
+
+minLag_r = opt.response.minLag;
+maxLag_r = opt.response.maxLag;
+nLags_r = maxLag_r - minLag_r + 1;
 
 nChan = opt.nChan;
 nStimPerFile = opt.nStimPerFile;
@@ -23,27 +24,34 @@ if nStimPerFile == 1
     opt.sumStim = true; % equivalent
 end
 
+% ?
+% unpad = opt.unpad.do;
+% ?
+
 
 %% Preallocation
 if opt.sumStim
-    % XtX will require 8 * (nLags*nFeatures)^2 bytes of memory
-    XtX = zeros([nLags*nFeatures,nLags*nFeatures],'double');
+    % XtX will require 8 * (nLags_s * nFeatures)^2 bytes of memory
+    XtX = zeros(nLags_s*nFeatures*[1,1],'double');
     s = [];
 else
-    % XtX will require 8 * (nLags*nFeatures)^2 * nStimuli  bytes of memory
-    XtX = zeros([nLags*nFeatures,nLags*nFeatures,nStimPerFile],'double');
+    % XtX will require 8 * (nLags_s*nFeatures)^2 * nStimuli  bytes of memory
+    XtX = zeros([nLags_s*nFeatures,nLags_s*nFeatures,nStimPerFile],'double');
     s = nStimPerFile;
 end
-
 if ~opt.sumSub
     s = [s,nSub];
 end
 
-Xty = zeros([nLags*nFeatures,nChan,s],'double');
+% yty will require 8 * (nLags_r * nChan)^2 (* nStimPerFile) (* nSub) bytes of memory
+yty = zeros([nLags_r * nChan, nLags_r * nChan,s ],'double');
+
+% Xty will require 8 * (nLags_s * nFeatures) * (nLags_r * nChan) (* nStimPerFile) (* nSub) bytes of memory
+Xty = zeros([nLags_s * nFeatures, nLags_r * nChan, s],'double');
 
 
 %% Loading feature representation for all stimuli
-% feature should be a matrix of size [~,nFeatures] or cell with nStimPerFile
+% feature sould be a matrix of size [~,nFeatures] or cell with nStimPerFile
 % elements containing matrices of size [~,nFeatures]
 feature = opt.getStimulus(stimOpt);
 
@@ -60,17 +68,14 @@ xF = cell(nStimPerFile,1);
 % if opt.sumSub, this needs to be multiplied by nSub
 N = nan(1,nStimPerFile);
 
-% if opt.sumSub, XtX needs to be multiplied by nSub (same XtX accumulated
-% over subjects)
-mX = nan(nFeatures*nLags,nStimPerFile,'double');
-mY = nan(nChan,nStimPerFile,nSub,'double');
+mX = nan(nFeatures*nLags_s,nStimPerFile,'double');
+mY = nan(nLags_r*nChan,nStimPerFile,nSub,'double');
 
 Xtop = cell(nStimPerFile,1);
 Xbottom = cell(nStimPerFile,1);
 
 
-
-%% Making Xty for each subject & stimulus
+%% Making Xty & yty for each subject & stimulus
 xbe = nan(2,nStimPerFile);
 
 for iSub = 1:nSub
@@ -83,6 +88,7 @@ for iSub = 1:nSub
         
         opt.nx = size(feature{iStimulus},1);
         opt.iB = iB(iStimulus);
+        
         
         if opt.unpad.do
             unpad = LM.laggedDims(opt.nx,opt.iB,size(response,1),minLag,maxLag);
@@ -103,11 +109,7 @@ for iSub = 1:nSub
         
         if iSub == 1
             % same for all subject, but need unpad structure to be
-            % initialised if unpadding (which requires iB).
-            % Hence the feature FFT calculations are done here.
-            % Not initialising opt.xb to 1 in case only 1 subject is used
-            % and the adjustments for unpadding done by LM.laggedDims are
-            % desired.
+            % initialised if unpadding
             [XtX_,xF{iStimulus},mX(:,iStimulus),...
                 Xtop{iStimulus},Xbottom{iStimulus},N(iStimulus)] = LM.laggedXtX(feature{iStimulus},minLag,maxLag,opt);
             

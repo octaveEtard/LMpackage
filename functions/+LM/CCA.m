@@ -1,3 +1,4 @@
+
 function [Ax,Ay,Q] = CCA(x,y,opt)
 %
 % LM.CCA

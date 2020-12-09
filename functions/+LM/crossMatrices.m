@@ -14,6 +14,8 @@ if numel(stimOpt) == 1
             [XtX,Xty,mX,mY,N] = LM.forward_crossMatrices(stimOpt,EEGopt,opt);
         case 'backward'
             [XtX,Xty,mX,mY,N] = LM.backward_crossMatrices(stimOpt,EEGopt,opt);
+        case 'CCA'
+            [XtX,Xty,mX,mY,N,yty] = LM.CCA_crossMatrices(stimOpt,EEGopt,opt)
     end
     return;
 end

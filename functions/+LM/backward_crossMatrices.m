@@ -4,6 +4,11 @@ function [XtX,Xty,mX,mY,N] = backward_crossMatrices(stimOpt,EEGopt,opt)
 % Part of the Linear Model (LM) package.
 % Author: Octave Etard
 %
+% Form backward matrices for one element of stimOpt. If 1 < numel(stimOpt),
+% see LM.crossMatrices that iterates over stimOpt.
+%
+% See also LM.forward_crossMatrices
+%
 minLag = opt.minLag;
 maxLag = opt.maxLag;
 nLags = maxLag - minLag + 1;
@@ -36,7 +41,7 @@ Xty = zeros([nLags*nChan,nFeatures,s],'double');
 
 
 %% Loading feature representation for all stimuli
-% feature sould be a matrix of size [~,nFeatures] or cell with nStimuli
+% feature should be a matrix of size [~,nFeatures] or cell with nStimuli
 % elements containing matrices of size [~,nFeatures]
 feature = opt.getStimulus(stimOpt);
 

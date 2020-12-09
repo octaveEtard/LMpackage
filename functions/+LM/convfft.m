@@ -25,7 +25,7 @@ sc = 8 *  nFFT * ndims_y / 1e9; % to store the result
 nd = floor((maxMem-sc)/k);
 
 if maxMem < sc
-    error('Will exceed max memmory');
+    error('Will exceed max memory');
 end
 
 if 0 < maxMem && nd < ndims_y
