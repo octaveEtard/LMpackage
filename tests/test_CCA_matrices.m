@@ -25,3 +25,12 @@ xp'
 yp'
 size(X), size(Y)
 [X,Y]
+
+%%
+opt = [];
+opt.nPad = maxLag - minLag;
+opt.unpad.do = false;
+opt.removeMean = false;
+
+XtX = LM.laggedXtX(x,minLag_x,maxLag_x,opt)
+yty = LM.laggedXtX(y,minLag_y,maxLag_y,opt)
