@@ -81,7 +81,6 @@ end
 
 XtX = nan(nLags*nFeatures,nLags*nFeatures,'like',x);
 
-
 nFFT = 2^nextpow2( nPnts + nPad );
 xF = fft(x,nFFT,1);
 

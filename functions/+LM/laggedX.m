@@ -78,7 +78,7 @@ function X = laggedX(x,minLag,maxLag,iB,ny)
 %
 %------
 %%
-[nPnts,nFeatures] = size(x);
+nPnts = size(x,1);
 
 if nargin < 4
     iB = 1;
@@ -88,20 +88,22 @@ if nargin < 5
 end
 
 opt = LM.laggedDims(nPnts,iB,ny,minLag,maxLag);
-xb = opt.xb;
-xe = opt.xe;
+% xb = opt.xb;
+% xe = opt.xe;
 
-nLags = maxLag - minLag + 1;
-n = xe - xb - nLags + 2;
+X = LM.lagMatrix(x(opt.xb:opt.xe,:), nLags);
 
-X = nan(n, nLags * nFeatures,'like',x);
-
-idx = (1:n) + xb - 1;
-dimOffset = ((1:nFeatures)-1)*nLags;
-
-for iLag = 1:nLags
-    X(:,dimOffset + iLag) = x(idx - iLag + nLags,:);
-end
+% nLags = maxLag - minLag + 1;
+% n = xe - xb - nLags + 2;
+% 
+% X = nan(n, nLags * nFeatures,'like',x);
+% 
+% idx = (1:n) + xb - 1;
+% dimOffset = ((1:nFeatures)-1)*nLags;
+% 
+% for iLag = 1:nLags
+%     X(:,dimOffset + iLag) = x(idx - iLag + nLags,:);
+% end
 
 end
 %
