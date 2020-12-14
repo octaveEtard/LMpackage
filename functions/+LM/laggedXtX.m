@@ -89,7 +89,7 @@ xF = fft(x,nFFT,1);
 % pairs, and fill in XtX
 
 for iFeature = 1:nFeatures
-    % xc x(iFeature,:) with x(iFeature ... nFeature,:)
+    % xc x(:,iFeature) with x(:,iFeature ... nFeature)
     xc = ifft(conj(xF(:,iFeature)) .* xF(:,iFeature:end),nFFT,1,'symmetric');
     % size 2 * nLags - 1 with 0 lag in the middle at index nLags
     xc = [xc( (1:(nLags-1)) - nLags + 1 + nFFT,:); xc(1:nLags,:)];

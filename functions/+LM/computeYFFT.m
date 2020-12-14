@@ -1,6 +1,10 @@
 function [yF,mY,n_mY,Ytop,Ybottom] = computeYFFT(y,minLag,maxLag,nFFT,opt)
 %
 % LM.computeYFFT
+%
+% Compute the conjugated of the Fourier Transform of y that is necessary to
+% 
+%
 % Part of the Linear Model (LM) package.
 % Author: Octave Etard
 %
