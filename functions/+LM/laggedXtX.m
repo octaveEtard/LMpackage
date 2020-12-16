@@ -86,7 +86,7 @@ xF = fft(x,nFFT,1);
 
 % XtX = X' * X
 % Compute the cross-correlation between x(:,i) and x(:,j) for all i <= j
-% pairs, and fill in XtX
+% pairs, and fill in XtX. The remaining pairs can be filled by symmetry.
 
 for iFeature = 1:nFeatures
     % xc x(:,iFeature) with x(:,iFeature ... nFeature)

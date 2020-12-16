@@ -77,9 +77,6 @@ function [XtY] = laggedXt_2(xF,yF,opt)
 
 assert(nFFT == nFFT_);
 
-% TODO here or not?
-yF = conj(yF);
-
 nLags_x = opt.maxLag_x - opt.minLag_x + 1;
 nLags_y = opt.maxLag_y - opt.minLag_y + 1;
 
@@ -97,20 +94,19 @@ XtY = nan(nDims_x * nLags_x, nDims_y * nLags_y, 'double');
 
 for iDim_x = 1:nDims_x
     % xc x(:,iDim_x) with y(:,1 ... nDims_y)
-    xc = ifft(yF .* xF(:,iDim_x),nFFT,1,'symmetric');
+    xc = ifft(conj(yF) .* xF(:,iDim_x),nFFT,1,'symmetric');
     % size 2 * nLags - 1 with 0 lag in the middle at index nLags
     xc = flip([xc( (1:(nLags-1)) - nLags + 1 + nFFT,:); xc(1:nLags,:)],1);
     
     % fill block-rows iFeature
-    dimOffset_x = ((1:nDims_x) - 1) * nLags_x;
     dimOffset_y = ((1:nDims_y) - 1) * nLags_y;
     
     for iLag_y = 1:nLags_y
-        XtY((1:nLags_x) + dimOffset_x(1),iLag_y + dimOffset_y) = xc( (1:nLags_x) + nLags - 1 - iLag_y + 1 + dLag,:);
+        XtY(1:nLags_x, iLag_y + dimOffset_y) = xc( (1:nLags_x) + nLags - 1 - iLag_y + 1 + dLag,:);
     end
 end
 
-% TODO merge this with LM.laggedXtX ?
+% TODO merge this with LM.laggedXtX or LM.laggedXty ?
 
 %%
 % Compute Xty as if the data was not padded by removing the top and bottom
