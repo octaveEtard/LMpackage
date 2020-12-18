@@ -1,7 +1,7 @@
 # LMpackage
 Octave Etard (octave.etard11@imperial.ac.uk)
 
-Matlab routines for fitting linear forward / backward models.
+Matlab routines for fitting linear forward / backward models / CCA.
 
 **Requires Matlab R2019b or newer** (tested on R2019b & R2020a/b).
 
