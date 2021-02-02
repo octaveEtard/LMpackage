@@ -1,99 +1,53 @@
-function [XtY,x,y] = laggedXtY(x,y,opt,...
-    isXFFT,mX,n_mX,Xtop,Xbottom,...
-    isYFFT,mY,n_mY,Ytop,Ybottom)
+function XtY = laggedXtY(xF,yF,minLag_x,maxLag_x,minLag_y,maxLag_y,n_m,...
+    mX,Xtop,Xbottom,...
+    mY,Ytop,Ybottom,...
+    opt)
 %
-% LM.laggedXty
+% LM.laggedXty ---- Work in progress -- incomplete code!
 % Part of the Linear Model (LM) package.
 % Author: Octave Etard
 %
 %% Preparing input arguments
 %
-% in this case compute XtX
-if isempty(y)
-    opt.maxLag_y = opt.maxLag_x;
-    opt.minLag_y = opt.minLag_x;
-    
-    isYFFT = isXFFT;
-    auto = true; % auto-correlation
-else
-    auto = false;
-end
-
 % lags
-nLags_x = opt.maxLag_x - opt.minLag_x + 1;
-nLags_y = opt.maxLag_y - opt.minLag_y + 1;
+nLags_x = maxLag_x - minLag_x + 1;
+nLags_y = maxLag_y - minLag_y + 1;
 
-minLag = min(opt.minLag_x, opt.minLag_y);
-maxLag = max(opt.maxLag_x, opt.maxLag_y);
-nLags = maxLag - minLag + 1;
+% minLag = min(minLag_x, minLag_y);
+% maxLag = max(maxLag_x, maxLag_y);
+% nLags = maxLag - minLag + 1;
 
-% Fourier transform of x and y
-if ~(isXFFT || isYFFT)
-    nPnts = size(x,1);
-    
-    if nLags_x == 1 && nLags_y == 1
-        error('!'); % FIXME
-    elseif nLags_x == 1 || nLags_y == 1
-        nPad = max(nLags_x,nLags_y) - 1;
-    else
-        nPad = nLags - 1;
-    end
-    nFFT = 2^nextpow2( nPnts + nPad - 1 );
-    
-elseif isXFFT
-    nFFT = size(x,1);
-else
-    nFFT = size(y,1);
-end
+[nFFT,nDims_x] = size(xF);
+nDims_y = size(yF,2); % size(yF,1) sould be == nFFT too
 
-if ~isXFFT
-    x = fft(x,nFFT,1);
-end
+yF = conj(yF);
 
-if auto
-    y = x;
-elseif ~isYFFT
-    error('!'); % FIXME this is not how fft(y) should be computed
-    y = fft(y,nFFT,1);
-end
-
-nDims_x = size(x,2);
-nDims_y = size(y,2);
-
-dLag = opt.maxLag_y - opt.maxLag_x;
 
 %%
-XtY = nan(nDims_x * nLags_x, nDims_y * nLags_y, 'double');
+lags = ((maxLag_x - minLag_y):-1:(minLag_x - maxLag_y)) + (opt.dims.yb - opt.dims.y.iB);
+lags = LM.lagToIndex(lags,nFFT);
 
 % XtY = X' * Y
 % Compute the cross-correlation between x(:,i) and y(:,j) for all (i,j)
 % pairs, and fill in XtY
+dimOffset_y = ((1:nDims_y) - 1) * nLags_y;
+XtY = nan(nDims_x * nLags_x, nDims_y * nLags_y, 'double');
 
 for iDim_x = 1:nDims_x
     % xc x(:,iDim_x) with y(:,1 ... nDims_y)
-    xc = ifft(conj(y) .* x(:,iDim_x),nFFT,1,'symmetric');
-    % size 2 * nLags - 1 with 0 lag in the middle at index nLags
-    xc = [xc( (1:(nLags-1)) - nLags + 1 + nFFT,:); xc(1:nLags,:)];
-    % TODO FIXME flip necessary?
-    
-    if auto
-        % making sure XtX is symmetric ; xc(:,1) should be, but there may be
-        % numerical differences
-        xc(1:nLags,1) = flip(xc(nLags:end,1),1);
-    else
-        xc = flip(xc,1);
-    end
+    % y already conj
+    xc = ifft(yF .* xF(:,iDim_x),nFFT,1,'symmetric');
+    xc = xc(lags,:);
     
     % fill block-rows iFeature
-    dimOffset_x = ((1:nDims_x) - 1) * nLags_x;
-    dimOffset_y = ((1:nDims_y) - 1) * nLags_y;
+    dimOffset_x = (iDim_x - 1) * nLags_x;
     
     for iLag_y = 1:nLags_y
-        XtY((1:nLags_x) + dimOffset_x(1),iLag_y + dimOffset_y) = xc( (1:nLags_x) + nLags - 1 - iLag_y + 1 + dLag,:);
+        % XtY((1:nLags_x) + dimOffset_x,iLag_y + dimOffset_y) = xc( (1:nLags_x) + nLags - 1 - iLag_y + 1 + dLag,:);
+        XtY((1:nLags_x) + dimOffset_x,iLag_y + dimOffset_y) = xc( (1:nLags_x) + nLags_y - iLag_y,:);
     end
 end
 
-% TODO merge this with LM.laggedXtX or LM.laggedXty ?
 
 %%
 % Compute Xty as if the data was not padded by removing the top and bottom
@@ -104,17 +58,16 @@ end
 
 
 %% Centering
-% These operations are the equivalent of centering X and y before computing
-% XtX and Xty:
+% These operations are the equivalent of centering the lagged matrices X &
+% Y before computing XtY:
 %
 % X = X - mean(X,1);
-% y = y - mean(y,1); Xty = X' * y;
+% Y = y - mean(Y,1);
+% XtY = X' * Y;
 %
 if opt.removeMean
-    XtY = XtY - n_mY * (mX' .* mY);
-end
-
-if auto
-    y = [];
+    XtY = XtY - n_m * (mX' .* mY);
 end
 end
+%
+%

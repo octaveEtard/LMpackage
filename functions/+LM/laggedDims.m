@@ -27,12 +27,15 @@ function opt = laggedDims(nx,iB,ny,minLag,maxLag)
 % If the corresponding points in y do not exist, y is padded with 0 as
 % well.
 %
+%   => x will be padded, and y may be padded as well.
+%
 % - If no padding is desired:
 %
 % Use windows such that the first begins at index 1 and the last one ends
 % at index nx. This is then corrected to ensure the corresponding points
 % are in y.
 %
+%   => neither x nor y are padded.
 %
 % Output (in opt structure):
 %

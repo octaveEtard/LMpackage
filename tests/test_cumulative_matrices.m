@@ -11,6 +11,7 @@ maxLags = [-2, 3, 5];
 maxDev = [0,0];
 maxDev_pred = 0;
 
+tic;
 for n = [8,10,15]
     
     % some data
@@ -123,5 +124,6 @@ for n = [8,10,15]
         end
     end
 end
+toc;
 maxDev
 maxDev_pred

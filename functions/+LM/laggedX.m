@@ -4,6 +4,8 @@ function X = laggedX(x,minLag,maxLag,iB,ny)
 % Part of the Linear Model (LM) package.
 % Author: Octave Etard
 %
+% Wrapper around the LM.lagMatrix function.
+%
 % Given a timeseries x with [nPnts,nFeatures] = size(x),
 % minLag <= maxLag integers, ny the number of points in a timeseries y, and
 % iB the time index to synchronize x and y (i.e. such that y(iB,:)
@@ -87,23 +89,12 @@ if nargin < 5
     ny = nPnts;
 end
 
+% compute usable points
 opt = LM.laggedDims(nPnts,iB,ny,minLag,maxLag);
-% xb = opt.xb;
-% xe = opt.xe;
+nLags = maxLag - minLag + 1;
 
+% create lag matrix
 X = LM.lagMatrix(x(opt.xb:opt.xe,:), nLags);
-
-% nLags = maxLag - minLag + 1;
-% n = xe - xb - nLags + 2;
-% 
-% X = nan(n, nLags * nFeatures,'like',x);
-% 
-% idx = (1:n) + xb - 1;
-% dimOffset = ((1:nFeatures)-1)*nLags;
-% 
-% for iLag = 1:nLags
-%     X(:,dimOffset + iLag) = x(idx - iLag + nLags,:);
-% end
 
 end
 %

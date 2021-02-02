@@ -79,20 +79,24 @@ else
     nPad = nLags - 1; % default value (non-periodic, zero padded signal)
 end
 
-XtX = nan(nLags*nFeatures,nLags*nFeatures,'like',x);
-
 nFFT = 2^nextpow2( nPnts + nPad );
 xF = fft(x,nFFT,1);
+
+% size 2 * nLags - 1 with 0 lag in the middle at index nLags
+lags = (-nLags+1):(nLags-1);
+lags = LM.lagToIndex(lags,nFFT);
 
 % XtX = X' * X
 % Compute the cross-correlation between x(:,i) and x(:,j) for all i <= j
 % pairs, and fill in XtX. The remaining pairs can be filled by symmetry.
+XtX = nan(nLags*nFeatures,nLags*nFeatures,'double');
 
 for iFeature = 1:nFeatures
     % xc x(:,iFeature) with x(:,iFeature ... nFeature)
     xc = ifft(conj(xF(:,iFeature)) .* xF(:,iFeature:end),nFFT,1,'symmetric');
     % size 2 * nLags - 1 with 0 lag in the middle at index nLags
-    xc = [xc( (1:(nLags-1)) - nLags + 1 + nFFT,:); xc(1:nLags,:)];
+    xc = xc(lags,:);
+    
     % making sure XtX is symmetric ; xc(:,1) should be, but there may be
     % numerical differences
     xc(1:nLags,1) = flip(xc(nLags:end,1),1);

@@ -83,27 +83,23 @@ iB = opt.iB;
 
 yb = max(1,iB-maxLag);
 
-if isYFFT
-    yF = y;
-    % in this case Ytop, Ybottom, mY and n_mY have to be provided as needed
-else
+if ~isYFFT
     % conjugated of Fourier Transform of y
-    [yF,mY,n_mY,Ytop,Ybottom] = LM.computeYFFT(y,minLag,maxLag,nFFT,opt);
+    [y,mY,n_mY,Ytop,Ybottom] = LM.computeYFFT(y,minLag,maxLag,nFFT,opt);
+    %
+    % otherwise Ytop, Ybottom, mY and n_mY have to be provided as needed
 end
 
-nPad_b = yb - (iB-maxLag);
-ie = nPad_b + 1;
-ib = max(1,ie-nLags+1);
-ne = nLags - ie + ib - 1;
-
+lags = (maxLag:-1:minLag) + (yb - iB);
+lags = LM.lagToIndex(lags,nFFT);
 
 nOut = size(y,2);
 Xty = nan(nLags*nFeatures,nOut,'double');
 
 for iFeature = 1:nFeatures
     % xc x(:,iFeature) with y
-    xc = ifft(xF(:,iFeature) .* yF,nFFT,1,'symmetric');
-    xc = flip( [xc( (1:ne) - ne + end,:) ; xc(ib:ie,:)], 1);
+    xc = ifft(xF(:,iFeature) .* y,nFFT,1,'symmetric');
+    xc = xc(lags,:);
     
     % fill block-rows iFeature
     dimOffset = (iFeature-1)*nLags;
