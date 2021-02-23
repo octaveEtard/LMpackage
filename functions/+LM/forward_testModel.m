@@ -166,7 +166,7 @@ for iSub = 1:nSub
                 
                 nWin = floor(N / nPntsWin);
                 
-                if iSub == 1 && iBatch
+                if iSub == 1 && iBatch == 1
                     % initialisation
                     CC{iPerfSize,iStimulus} = nan(nWin,nChan,nReg,nSub);
                     MSE{iPerfSize,iStimulus} = nan(nWin,nChan,nReg,nSub);

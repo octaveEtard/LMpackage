@@ -7,7 +7,7 @@ function [impResponse,t,nMax] = exampleIR(type,Fs)
 % Two examples of impulse responses.
 %
 
-tMaxResponse = 400e-3; % in s
+tMaxResponse = 500e-3; % in s
 
 switch type
     case 1  % simple Gaussian response
