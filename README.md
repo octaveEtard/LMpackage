@@ -9,6 +9,8 @@ Matlab routines for fitting linear forward / backward models / CCA.
 ## Introduction
 This package consists of Matlab routines for fitting linear forward / backward models (deconvolution). It implements ridge-regularised linear models, with options to use different L2 penalties (e.g. curvature). This implementation strives for computational and memory efficiency to allow for more flexibility e.g. when fitting large models with high sampling rate, or to form generic cross-validated models faster.
 
+This is achieved by using Fourier methods to compute cross-covariance / cross-correlation matrices directly, without ever forming the underlying matrices.
+
 It incorporates high-level "wrapper" functions that should make fitting models straightforward, with users needing only to specify functions to read-in the input data, and contains examples illustrating how to use the code.
 
 
